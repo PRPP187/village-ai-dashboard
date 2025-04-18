@@ -1,4 +1,3 @@
-# jecsun.py (เริ่มบรรทัดที่ 1)
 import numpy as np
 import random
 import json
@@ -42,20 +41,6 @@ def optimize_ratios():
     return ratios
 
 H_TYPE_RATIOS = optimize_ratios()
-
-def save_q_table():
-    global q_table
-    with open(Q_TABLE_FILE, "w") as f:
-        json.dump(q_table, f)
-
-def load_q_table():
-    global q_table
-    if os.path.exists(Q_TABLE_FILE):
-        with open(Q_TABLE_FILE, "r") as f:
-            q_table = json.load(f)
-        print("✅ โหลด Q-table สำเร็จ")
-    else:
-        print("📁 ยังไม่มี Q-table เดิม เริ่มใหม่ตั้งแต่ต้น")
 
 def calculate_reward_verbose(grid):
     # ✅ กรณี grid เป็น None หรือว่าง
@@ -337,18 +322,28 @@ def update_q_table(state, action, reward, next_state):
 # ✅ ฟังก์ชัน Train AI
 
 def train_ai(episodes, grid):
+    """
+    ฝึก AI ด้วย Reinforcement Learning (Q-Learning)
+    """
     best_grid = None
     best_score = float('-inf')
 
     for episode in range(episodes):
-        state = [row[:] for row in grid]
+        state = [row[:] for row in grid]  # ใช้ Grid เดิมทุก Episode
+        total_reward = 0
 
-        while any('0' in row for row in state):
+        for _ in range(GRID_ROWS * GRID_COLS):
             action = choose_action(state)
+
             if action is None:
-                break
+                if any('0' in row for row in state):  # ถ้ายังมี 0 ห้ามหยุด
+                    continue
+                else:
+                    break
+
             r, c, char = action
             state[r][c] = char
+
             reward = calculate_reward_verbose(state)
             update_q_table(state, action, reward, state)
 
@@ -358,22 +353,28 @@ def train_ai(episodes, grid):
             best_score = total_reward
             best_grid = [row[:] for row in state]
 
-        if (episode + 1) % 1000 == 0:
-            print(f\"📈 Episode {episode + 1}/{episodes}, Score: {total_reward}\")
+        if (episode + 1) % 10000 == 0:
+            print(f"Episode {episode + 1}/{episodes}, Reward: {total_reward}")
 
-    save_q_table()
     return best_grid, best_score
 
 # ✅ ฟังก์ชันจับเวลาการรัน
 
 def measure_execution_time(function, *args, **kwargs):
-    start_time = time.time()
-    res1, res2 = function(*args, **kwargs)
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    elapsed_minutes = elapsed_time / 60
+    """
+    ฟังก์ชันวัดเวลาการรันของฟังก์ชันที่กำหนด
+    คืนค่า: (ผลลัพธ์จากฟังก์ชัน, เวลาที่ใช้)
+    """
+    start_time = time.time()  # ⏳ เริ่มจับเวลา
+    result = function(*args, **kwargs)  # ✅ เรียกใช้ฟังก์ชันที่ต้องการวัดเวลา
+    end_time = time.time()  # ⏳ หยุดจับเวลา
+
+    elapsed_time = end_time - start_time  # คำนวณเวลาที่ใช้
+    elapsed_minutes = elapsed_time / 60  # แปลงเป็นนาที
+
     print(f"\n⏳ ใช้เวลาทั้งหมด: {elapsed_time:.2f} วินาที ({elapsed_minutes:.2f} นาที)")
-    return res1, res2, elapsed_time
+
+    return *result, elapsed_time  # ✅ ใช้ `*result` เพื่อแยกค่าที่คืนจากฟังก์ชันหลัก
 
 def analyze_profit(grid):
     summary = {k: 0 for k in HOUSE_PRICES}
@@ -407,7 +408,6 @@ def analyze_profit(grid):
 
 # ✅ ฝึก AI และบันทึกผลลัพธ์
 q_table = {}
-load_q_table()
 
 # ✅ เลื่อน `E` ก่อน
 grid, new_e_position = initialize_grid(GRID_ROWS, GRID_COLS, E_START_POSITION)
