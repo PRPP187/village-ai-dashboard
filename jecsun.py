@@ -42,20 +42,15 @@ def optimize_ratios():
 
 H_TYPE_RATIOS = optimize_ratios()
 
-def calculate_reward_verbose(grid):
-    # ✅ กรณี grid เป็น None หรือว่าง
+def calculate_reward_verbose(grid, green_ratio_min=0.1):
     if grid is None or len(grid) == 0 or len(grid[0]) == 0:
-        print(f"⚠️ Error: grid เป็น None หรือว่าง! กำลังใช้ Grid เปล่าแทน...")
         grid_size = 5
-        grid = np.full((grid_size, grid_size), '0')  # ใช้ NumPy แทน List
+        grid = np.full((grid_size, grid_size), '0')
 
     grid = np.array(grid)
     rows, cols = grid.shape
-
-    # ✅ คำนวณคะแนนพื้นฐาน
     base_score = sum(SCORES.get(cell, 0) for row in grid for cell in row)
 
-    # ✅ ตรวจสอบโบนัสจาก Pattern
     bonus = 0
     bonus += np.sum((grid[:, :-2] == 'H') & (grid[:, 1:-1] == 'H') & (grid[:, 2:] == 'H')) * 100
     bonus += np.sum((grid[:, :-2] == 'R') & (grid[:, 1:-1] == 'R') & (grid[:, 2:] == 'R')) * 100
@@ -65,63 +60,43 @@ def calculate_reward_verbose(grid):
     bonus += np.sum((grid[:-1, :-1] == 'R') & (grid[:-1, 1:] == 'R') &
                     (grid[1:, :-1] == 'H') & (grid[1:, 1:] == 'H')) * 100
 
-    # ✅ ค่าปรับเกี่ยวกับ E และ R
     penalty = 0
     h_positions = np.argwhere(grid == 'H')
     e_positions = np.argwhere(grid == 'E')
 
-    # ✅ 1) ตรวจสอบว่ามี H ที่ติดกับ E หรือไม่
-    #if len(h_positions) > 0 and len(e_positions) > 0:
-        #h_neighbors_e = np.sum([
-            #np.roll(grid == 'E', shift, axis=axis)[h_positions[:, 0], h_positions[:, 1]]
-            #for shift, axis in [(1, 0), (-1, 0), (1, 1), (-1, 1)]
-        #], axis=0)
-        #penalty -= 100 * np.sum(h_neighbors_e)  # ✅ ปรับค่าให้ลงโทษตามจำนวน H ที่ติด E
-
-    # ✅ 2) ตรวจสอบว่ามี E ที่ไม่ได้ติด R หรือไม่
     if len(e_positions) > 0:
         e_neighbors_r = np.any([
             np.roll(grid == 'R', shift, axis=axis)[e_positions[:, 0], e_positions[:, 1]]
             for shift, axis in [(1, 0), (-1, 0), (1, 1), (-1, 1)]
         ], axis=0)
-
         if not np.any(e_neighbors_r):
             penalty -= 200
 
-    # ✅ 3) ตรวจสอบจำนวนกลุ่ม R (ถนน)
     r_clusters = count_r_clusters(grid) if np.any(grid == 'R') else 0
     if r_clusters > 1:
         penalty -= 500 * (r_clusters - 1)
 
-    # ✅ 4) ตรวจสอบว่า H ทุกหลังติด R หรือไม่
     if len(h_positions) > 0:
         h_neighbors_r = np.any([
             np.roll(grid == 'R', shift, axis=axis)[h_positions[:, 0], h_positions[:, 1]]
             for shift, axis in [(1, 0), (-1, 0), (1, 1), (-1, 1)]
         ], axis=0)
-
-        penalty -= 200 * np.sum(~h_neighbors_r)  # ลงโทษบ้านที่ไม่ได้ติดถนน
-
-        if np.all(h_neighbors_r):  # ✅ ถ้าบ้านทุกหลังติดถนน ให้โบนัส
+        penalty -= 200 * np.sum(~h_neighbors_r)
+        if np.all(h_neighbors_r):
             bonus += 100
 
-    # ✅ ตรวจสอบสัดส่วนพื้นที่สีเขียว (G)
     total_cells = rows * cols
     num_green = np.sum(grid == 'G')
     green_ratio = num_green / total_cells
 
-    if green_ratio < 0.1:
-        penalty -= 500  # ✅ ปรับลดคะแนนหากพื้นที่สีเขียวน้อยเกินไป
+    if green_ratio < green_ratio_min:
+        penalty -= 500
 
-    # ✅ ตรวจสอบว่ามีถนนหรือไม่
     roads_exist = np.sum(grid == 'R') > 0
     if not roads_exist:
-        penalty -= 500  # ลงโทษหนักถ้าไม่มีถนน
+        penalty -= 500
 
-    # ✅ คำนวณคะแนนรวม
     total_score = base_score + bonus + penalty
-    #print(f"🎯 Debug: คะแนน Grid = {total_score} (Base: {base_score}, Bonus: {bonus}, Penalty: {penalty})")
-
     return total_score
 
 def count_r_clusters(grid, use_dfs=False):
