@@ -58,30 +58,12 @@ if st.sidebar.button("🚀 เริ่มฝึก AI"):
     st.success(f"คะแนนสูงสุด: {best_score}")
     render_colored_grid(final_grid, "📌 ผังหลังวาง H1–H4")
 
-    st.subheader("📊 วิเคราะห์ผลกำไรของผังที่ดีที่สุด")
+    st.subheader("📊 วิเคราะห์ผลกำไร")
     buffer = io.StringIO()
     sys.stdout = buffer
     analyze_profit(final_grid)
     sys.stdout = sys.__stdout__
     st.text(buffer.getvalue())
-
-    # ✅ เปรียบเทียบ Top 3 Layouts
-    st.subheader("🔁 เปรียบเทียบผังอันดับ 1–3")
-
-    top_k = st.selectbox("เลือกผังอันดับ", [1, 2, 3])
-    selected_score, selected_grid = top3_layouts[top_k - 1]
-    selected_layout = apply_house_types([row[:] for row in selected_grid])
-
-    st.info(f"คะแนนของผังอันดับ {top_k}: {selected_score}")
-    render_colored_grid(selected_grid, f"📌 ผังอันดับ {top_k} (ก่อนวาง H1–H4)")
-    render_colored_grid(selected_layout, f"🏡 ผังอันดับ {top_k} (หลังวาง H1–H4)")
-
-    st.subheader("📊 วิเคราะห์ผลกำไรของผังนี้")
-    buffer2 = io.StringIO()
-    sys.stdout = buffer2
-    analyze_profit(selected_layout)
-    sys.stdout = sys.__stdout__
-    st.text(buffer2.getvalue())
 
     st.line_chart(rewards)
     st.balloons()
