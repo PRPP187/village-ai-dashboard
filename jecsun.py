@@ -16,7 +16,7 @@ ALPHA = 0.1
 GAMMA = 0.9
 SCORES = {'E': 10, 'G': 10, 'H': 15, 'R': 5, '0': 0}
 Q_TABLE_FILE = "q_table.json"
-E_START_POSITION = (2, 1)
+E_START_POSITION = (1, 1)
 
 # กำหนดราคาบ้านแต่ละแบบ (ต้นทุน, ราคาขาย, ขนาดตร.ม., market weight)
 HOUSE_PRICES = {
