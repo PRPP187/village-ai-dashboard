@@ -52,8 +52,8 @@ if st.sidebar.button("🚀 เริ่มฝึก AI"):
     render_colored_grid(grid, "📌 แผนผังเริ่มต้น (ก่อนฝึก AI)")
 
     with st.spinner("⏳ กำลังฝึก AI..."):
-        best_grid, best_score = train_ai(EPISODES, grid)
-
+        best_grid, best_score, action_log = train_ai(EPISODES, grid)
+    
     final_grid = apply_house_types([row[:] for row in best_grid])
 
     render_colored_grid(best_grid, "🏆 ผังที่ดีที่สุดที่ AI หาได้")
