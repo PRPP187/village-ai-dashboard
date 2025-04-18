@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import random
 from jecsuN import initialize_grid, load_or_initialize_grid, train_ai, apply_house_types, analyze_profit, GRID_ROWS, GRID_COLS, E_START_POSITION, EPISODES, csv_folder
+import io
+import sys
 
 st.set_page_config(page_title="AI ผังหมู่บ้าน", layout="wide")
 st.title("🏘️ AI วางผังหมู่บ้านอัตโนมัติด้วย Q-Learning")
@@ -38,8 +40,11 @@ if st.sidebar.button("🚀 เริ่มฝึก AI"):
     st.dataframe(pd.DataFrame(final_grid))
 
     st.subheader("📊 วิเคราะห์ผลกำไร")
-    with st.redirect_stdout():
-        analyze_profit(final_grid)
+    buffer = io.StringIO()
+    sys.stdout = buffer
+    analyze_profit(final_grid)
+    sys.stdout = sys.__stdout__
+    st.text(buffer.getvalue())
 
     st.balloons()
 else:
