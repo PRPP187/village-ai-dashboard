@@ -367,20 +367,13 @@ def train_ai(episodes, grid):
 # ✅ ฟังก์ชันจับเวลาการรัน
 
 def measure_execution_time(function, *args, **kwargs):
-    """
-    ฟังก์ชันวัดเวลาการรันของฟังก์ชันที่กำหนด
-    คืนค่า: (ผลลัพธ์จากฟังก์ชัน, เวลาที่ใช้)
-    """
-    start_time = time.time()  # ⏳ เริ่มจับเวลา
-    result = function(*args, **kwargs)  # ✅ เรียกใช้ฟังก์ชันที่ต้องการวัดเวลา
-    end_time = time.time()  # ⏳ หยุดจับเวลา
-
-    elapsed_time = end_time - start_time  # คำนวณเวลาที่ใช้
-    elapsed_minutes = elapsed_time / 60  # แปลงเป็นนาที
-
+    start_time = time.time()
+    res1, res2 = function(*args, **kwargs)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    elapsed_minutes = elapsed_time / 60
     print(f"\n⏳ ใช้เวลาทั้งหมด: {elapsed_time:.2f} วินาที ({elapsed_minutes:.2f} นาที)")
-
-    return *result, elapsed_time  # ✅ ใช้ `*result` เพื่อแยกค่าที่คืนจากฟังก์ชันหลัก
+    return res1, res2, elapsed_time
 
 def analyze_profit(grid):
     summary = {k: 0 for k in HOUSE_PRICES}
