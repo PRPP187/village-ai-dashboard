@@ -392,7 +392,7 @@ grid, _ = load_or_initialize_grid(csv_folder, GRID_ROWS, GRID_COLS, new_e_positi
 
 print(f"✅ ขนาดของ Grid หลังโหลด: {len(grid)} rows x {len(grid[0]) if grid else 0} cols | ตำแหน่ง E: {new_e_position}")
 
-best_grid, best_score, execution_time = measure_execution_time(train_ai, EPISODES, grid)
+best_grid, best_score, rewards, top3, execution_time = measure_execution_time(train_ai, EPISODES, grid, green_ratio_min)
 final_layout = apply_house_types([row[:] for row in best_grid])
 
 print(f"📂 CSV Files Found: {csv_files}")
