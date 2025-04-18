@@ -4,7 +4,7 @@ import pandas as pd
 import random
 import io
 import sys
-from jecsuN import initialize_grid, load_or_initialize_grid, train_ai, apply_house_types, analyze_profit, GRID_ROWS, GRID_COLS, E_START_POSITION, EPISODES, csv_folder
+from jecsun import initialize_grid, load_or_initialize_grid, train_ai, apply_house_types, analyze_profit, GRID_ROWS, GRID_COLS, E_START_POSITION, EPISODES, csv_folder
 
 st.set_page_config(page_title="AI ผังหมู่บ้าน", layout="wide")
 st.title("🏘️ AI วางผังหมู่บ้านอัตโนมัติด้วย Q-Learning")
