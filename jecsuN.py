@@ -332,14 +332,14 @@ def train_ai(episodes, grid):
         state = [row[:] for row in grid]  # ใช้ Grid เดิมทุก Episode
         total_reward = 0
 
-        for _ in range(GRID_ROWS * GRID_COLS):
+        while any('0' in row for row in state):
             action = choose_action(state)
-
             if action is None:
-                if any('0' in row for row in state):  # ถ้ายังมี 0 ห้ามหยุด
-                    continue
-                else:
-                    break
+                continue
+            r, c, char = action
+            state[r][c] = char
+            reward = calculate_reward_verbose(state)
+            update_q_table(state, action, reward, state)
 
             r, c, char = action
             state[r][c] = char
