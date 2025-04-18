@@ -11,8 +11,8 @@ st.title("🏘️ AI วางผังหมู่บ้านอัตโน�
 
 # --- Sidebar ---
 st.sidebar.header("🔧 ตั้งค่าก่อนเริ่ม")
-rows = st.sidebar.slider("จำนวนแถว (rows)", 3, 10, GRID_ROWS)
-cols = st.sidebar.slider("จำนวนคอลัมน์ (cols)", 3, 10, GRID_COLS)
+rows = st.sidebar.slider("จำนวนแถว (rows)", 3, 6, GRID_ROWS)
+cols = st.sidebar.slider("จำนวนคอลัมน์ (cols)", 3, 6, GRID_COLS)
 e_row = st.sidebar.number_input("ตำแหน่งแถวของ E (1-based)", 1, rows, E_START_POSITION[0])
 e_col = st.sidebar.number_input("ตำแหน่งคอลัมน์ของ E (1-based)", 1, cols, E_START_POSITION[1])
 e_position = (e_row, e_col)
