@@ -29,7 +29,6 @@ def calculate_reward_verbose(grid, green_ratio_min=0.1):
             np.roll(grid == 'R', shift, axis=axis)[e_positions[:, 0], e_positions[:, 1]]
             for shift, axis in [(1, 0), (-1, 0), (1, 1), (-1, 1)]
         ], axis=0)
-
         if not np.any(e_neighbors_r):
             penalty -= 200
 
@@ -42,7 +41,6 @@ def calculate_reward_verbose(grid, green_ratio_min=0.1):
             np.roll(grid == 'R', shift, axis=axis)[h_positions[:, 0], h_positions[:, 1]]
             for shift, axis in [(1, 0), (-1, 0), (1, 1), (-1, 1)]
         ], axis=0)
-
         penalty -= 200 * np.sum(~h_neighbors_r)
         if np.all(h_neighbors_r):
             bonus += 100
@@ -61,12 +59,13 @@ def calculate_reward_verbose(grid, green_ratio_min=0.1):
     total_score = base_score + bonus + penalty
     return total_score
 
-
 # ✅ อัปเดต train_ai ให้ส่งต่อ green_ratio_min
 
 def train_ai(episodes, grid, green_ratio_min=0.1):
     best_grid = None
     best_score = float('-inf')
+    rewards = []  # คะแนนทุกรอบ
+    top_layouts = []  # [(score, grid), ...]
 
     for episode in range(episodes):
         state = [row[:] for row in grid]
@@ -86,9 +85,16 @@ def train_ai(episodes, grid, green_ratio_min=0.1):
             update_q_table(state, action, reward, state)
 
         total_reward = calculate_reward_verbose(state, green_ratio_min)
+        rewards.append(total_reward)
 
+        # 🥇 เก็บ Top 3
+        top_layouts.append((total_reward, [row[:] for row in state]))
+        top_layouts = sorted(top_layouts, key=lambda x: x[0], reverse=True)[:3]
+
+        # 🎯 เก็บ Best Layout
         if total_reward > best_score:
             best_score = total_reward
             best_grid = [row[:] for row in state]
 
-    return best_grid, best_score
+    return best_grid, best_score, rewards, top_layouts
+
