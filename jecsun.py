@@ -322,36 +322,33 @@ def update_q_table(state, action, reward, next_state):
 # ✅ ฟังก์ชัน Train AI (ปรับใหม่ให้ใช้ขนาด grid จริง)
 def train_ai(episodes, grid):
     """
-    ฝึก AI ด้วย Reinforcement Learning (Q-Learning)
+    ฝึก AI ด้วย Reinforcement Learning (Q-Learning) พร้อมบันทึกขั้นตอนสำหรับ debug
     """
     best_grid = None
     best_score = float('-inf')
+    action_log = []
 
     for episode in range(episodes):
         state = [row[:] for row in grid]  # ใช้ Grid เดิมทุก Episode
-        total_reward = 0
-
         rows = len(state)
         cols = len(state[0]) if state else 0
         max_steps = rows * cols
 
-        for _ in range(max_steps):
+        for step in range(max_steps):
             action = choose_action(state)
 
             if action is None:
-                if any('0' in row for row in state):
-                    continue
-                else:
-                    break
+                break
 
             r, c, char = action
+            prev = state[r][c]
             state[r][c] = char
-
             reward = calculate_reward_verbose(state)
             update_q_table(state, action, reward, state)
 
-        total_reward = calculate_reward_verbose(state)
+            action_log.append(f"EP:{episode+1} STEP:{step+1} ➤ วาง '{char}' ที่ ({r+1},{c+1}) [จาก '{prev}'] → Reward: {reward}")
 
+        total_reward = calculate_reward_verbose(state)
         if total_reward > best_score:
             best_score = total_reward
             best_grid = [row[:] for row in state]
@@ -359,7 +356,7 @@ def train_ai(episodes, grid):
         if (episode + 1) % 10000 == 0:
             print(f"Episode {episode + 1}/{episodes}, Reward: {total_reward}")
 
-    return best_grid, best_score
+    return best_grid, best_score, action_log
 
 # ✅ ฟังก์ชันจับเวลาการรัน
 
@@ -411,22 +408,15 @@ def analyze_profit(grid):
 
 # ✅ ฝึก AI และบันทึกผลลัพธ์
 q_table = {}
-
-# ✅ เลื่อน `E` ก่อน
 grid, new_e_position = initialize_grid(GRID_ROWS, GRID_COLS, E_START_POSITION)
-
-# ✅ โหลด Grid จาก CSV โดยใช้ตำแหน่ง `E` ใหม่
 grid, _ = load_or_initialize_grid(csv_folder, GRID_ROWS, GRID_COLS, new_e_position)
 
 print(f"✅ ขนาดของ Grid หลังโหลด: {len(grid)} rows x {len(grid[0]) if grid else 0} cols | ตำแหน่ง E: {new_e_position}")
 
-best_grid, best_score, execution_time = measure_execution_time(train_ai, EPISODES, grid)
+best_grid, best_score, action_log = train_ai(EPISODES, grid)
 final_layout = apply_house_types([row[:] for row in best_grid])
 
-print(f"📂 CSV Files Found: {csv_files}")
-print(f"📂 Searching CSV in: {csv_folder}")
-
-print("\n🏆 Best Layout Found:")
+print(f"\n🏆 Best Layout Found:")
 for row in best_grid:
     print(" ".join(row))
 print(f"\n✅ Best Score Achieved: {best_score}")
@@ -436,3 +426,7 @@ for row in final_layout:
     print(" ".join(row))
 
 analyze_profit(final_layout)
+
+print("\n📜 ACTION LOG (AI Placement):")
+for log in action_log[-20:]:  # แสดงท้าย ๆ พอประมาณ
+    print(log)
