@@ -42,18 +42,20 @@ def optimize_ratios():
     return ratios
 
 H_TYPE_RATIOS = optimize_ratios()
+
 def save_q_table():
-    with open(Q_TABLE_FILE, \"w\") as f:
+    global q_table
+    with open(Q_TABLE_FILE, "w") as f:
         json.dump(q_table, f)
 
 def load_q_table():
     global q_table
     if os.path.exists(Q_TABLE_FILE):
-        with open(Q_TABLE_FILE, \"r\") as f:
+        with open(Q_TABLE_FILE, "r") as f:
             q_table = json.load(f)
-        print(\"✅ โหลด Q-table สำเร็จ\")
+        print("✅ โหลด Q-table สำเร็จ")
     else:
-        print(\"📁 ยังไม่มี Q-table เดิม เริ่มใหม่ตั้งแต่ต้น\")
+        print("📁 ยังไม่มี Q-table เดิม เริ่มใหม่ตั้งแต่ต้น")
 
 def calculate_reward_verbose(grid):
     # ✅ กรณี grid เป็น None หรือว่าง
