@@ -299,7 +299,8 @@ def update_q_table(state, action, reward, next_state):
 def train_ai(episodes, grid, green_ratio_min=0.1):
     best_grid = None
     best_score = float('-inf')
-    rewards = []  # สำหรับกราฟ
+    rewards = []  # คะแนนทุกรอบ
+    top_layouts = []  # [(score, grid), ...]
 
     for episode in range(episodes):
         state = [row[:] for row in grid]
@@ -321,11 +322,16 @@ def train_ai(episodes, grid, green_ratio_min=0.1):
         total_reward = calculate_reward_verbose(state, green_ratio_min)
         rewards.append(total_reward)
 
+        # 🥇 เก็บ Top 3
+        top_layouts.append((total_reward, [row[:] for row in state]))
+        top_layouts = sorted(top_layouts, key=lambda x: x[0], reverse=True)[:3]
+
+        # 🎯 เก็บ Best Layout
         if total_reward > best_score:
             best_score = total_reward
             best_grid = [row[:] for row in state]
 
-    return best_grid, best_score, rewards
+    return best_grid, best_score, rewards, top_layouts
 
 # ✅ ฟังก์ชันจับเวลาการรัน
 
