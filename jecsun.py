@@ -9,21 +9,21 @@ from collections import deque
 import time
 
 # ตั้งค่าขนาด Grid
-GRID_ROWS = 3
-GRID_COLS = 3
-EPISODES = 50000
+GRID_ROWS = 4
+GRID_COLS = 4
+EPISODES = 1000
 ALPHA = 0.1
 GAMMA = 0.9
 SCORES = {'E': 10, 'G': 10, 'H': 15, 'R': 5, '0': 0}
 Q_TABLE_FILE = "q_table.json"
-E_START_POSITION = (1, 1)
+E_START_POSITION = (2, 1)
 
 # กำหนดราคาบ้านแต่ละแบบ (ต้นทุน, ราคาขาย, ขนาดตร.ม., market weight)
 HOUSE_PRICES = {
-    'H1': {'cost': 2_500_000, 'sale': 2_500_000, 'size': 30, 'weight': 1.3},
-    'H2': {'cost': 2_400_000, 'sale': 3_000_000, 'size': 45, 'weight': 1.2},
-    'H3': {'cost': 2_900_000, 'sale': 3_500_000, 'size': 60, 'weight': 1.1},
-    'H4': {'cost': 3_200_000, 'sale': 4_000_000, 'size': 75, 'weight': 1.0},
+    'H1': {'cost': 2_000_000, 'sale': 2_800_000, 'size': 120, 'weight': 1.0},
+    'H2': {'cost': 1_800_000, 'sale': 2_500_000, 'size': 100, 'weight': 1.0},
+    'H3': {'cost': 2_200_000, 'sale': 2_900_000, 'size': 140, 'weight': 1.1},
+    'H4': {'cost': 2_500_000, 'sale': 3_200_000, 'size': 160, 'weight': 0.9},
 }
 
 # ✅ โหลดหรือสร้าง Grid จาก CSV ครั้งเดียว
@@ -319,8 +319,7 @@ def update_q_table(state, action, reward, next_state):
     max_future_q = max(q_table.get(next_state_str, {}).values() or [0])
     q_table[state_str][action_str] = (1 - ALPHA) * q_table[state_str][action_str] + ALPHA * (reward + GAMMA * max_future_q)
 
-# ✅ ฟังก์ชัน Train AI
-
+# ✅ ฟังก์ชัน Train AI (ปรับใหม่ให้ใช้ขนาด grid จริง)
 def train_ai(episodes, grid):
     """
     ฝึก AI ด้วย Reinforcement Learning (Q-Learning)
@@ -332,11 +331,15 @@ def train_ai(episodes, grid):
         state = [row[:] for row in grid]  # ใช้ Grid เดิมทุก Episode
         total_reward = 0
 
-        for _ in range(GRID_ROWS * GRID_COLS):
+        rows = len(state)
+        cols = len(state[0]) if state else 0
+        max_steps = rows * cols
+
+        for _ in range(max_steps):
             action = choose_action(state)
 
             if action is None:
-                if any('0' in row for row in state):  # ถ้ายังมี 0 ห้ามหยุด
+                if any('0' in row for row in state):
                     continue
                 else:
                     break
