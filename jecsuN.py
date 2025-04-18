@@ -41,6 +41,18 @@ def optimize_ratios():
     return ratios
 
 H_TYPE_RATIOS = optimize_ratios()
+def save_q_table():
+    with open(Q_TABLE_FILE, \"w\") as f:
+        json.dump(q_table, f)
+
+def load_q_table():
+    global q_table
+    if os.path.exists(Q_TABLE_FILE):
+        with open(Q_TABLE_FILE, \"r\") as f:
+            q_table = json.load(f)
+        print(\"✅ โหลด Q-table สำเร็จ\")
+    else:
+        print(\"📁 ยังไม่มี Q-table เดิม เริ่มใหม่ตั้งแต่ต้น\")
 
 def calculate_reward_verbose(grid):
     # ✅ กรณี grid เป็น None หรือว่าง
@@ -322,28 +334,18 @@ def update_q_table(state, action, reward, next_state):
 # ✅ ฟังก์ชัน Train AI
 
 def train_ai(episodes, grid):
-    """
-    ฝึก AI ด้วย Reinforcement Learning (Q-Learning)
-    """
     best_grid = None
     best_score = float('-inf')
 
     for episode in range(episodes):
-        state = [row[:] for row in grid]  # ใช้ Grid เดิมทุก Episode
-        total_reward = 0
+        state = [row[:] for row in grid]
 
         while any('0' in row for row in state):
             action = choose_action(state)
             if action is None:
-                continue
+                break
             r, c, char = action
             state[r][c] = char
-            reward = calculate_reward_verbose(state)
-            update_q_table(state, action, reward, state)
-
-            r, c, char = action
-            state[r][c] = char
-
             reward = calculate_reward_verbose(state)
             update_q_table(state, action, reward, state)
 
@@ -353,9 +355,10 @@ def train_ai(episodes, grid):
             best_score = total_reward
             best_grid = [row[:] for row in state]
 
-        if (episode + 1) % 10000 == 0:
-            print(f"Episode {episode + 1}/{episodes}, Reward: {total_reward}")
+        if (episode + 1) % 1000 == 0:
+            print(f\"📈 Episode {episode + 1}/{episodes}, Score: {total_reward}\")
 
+    save_q_table()
     return best_grid, best_score
 
 # ✅ ฟังก์ชันจับเวลาการรัน
@@ -408,6 +411,7 @@ def analyze_profit(grid):
 
 # ✅ ฝึก AI และบันทึกผลลัพธ์
 q_table = {}
+load_q_table()
 
 # ✅ เลื่อน `E` ก่อน
 grid, new_e_position = initialize_grid(GRID_ROWS, GRID_COLS, E_START_POSITION)
