@@ -321,22 +321,18 @@ def update_q_table(state, action, reward, next_state):
 
 # ✅ ฟังก์ชัน Train AI
 
-def train_ai(episodes, grid):
-    """
-    ฝึก AI ด้วย Reinforcement Learning (Q-Learning)
-    """
+def train_ai(episodes, grid, green_ratio_min=0.1):
     best_grid = None
     best_score = float('-inf')
+    rewards = []  # สำหรับกราฟ
 
     for episode in range(episodes):
-        state = [row[:] for row in grid]  # ใช้ Grid เดิมทุก Episode
-        total_reward = 0
+        state = [row[:] for row in grid]
 
         for _ in range(GRID_ROWS * GRID_COLS):
             action = choose_action(state)
-
             if action is None:
-                if any('0' in row for row in state):  # ถ้ายังมี 0 ห้ามหยุด
+                if any('0' in row for row in state):
                     continue
                 else:
                     break
@@ -344,19 +340,17 @@ def train_ai(episodes, grid):
             r, c, char = action
             state[r][c] = char
 
-            reward = calculate_reward_verbose(state)
+            reward = calculate_reward_verbose(state, green_ratio_min)
             update_q_table(state, action, reward, state)
 
-        total_reward = calculate_reward_verbose(state)
+        total_reward = calculate_reward_verbose(state, green_ratio_min)
+        rewards.append(total_reward)
 
         if total_reward > best_score:
             best_score = total_reward
             best_grid = [row[:] for row in state]
 
-        if (episode + 1) % 10000 == 0:
-            print(f"Episode {episode + 1}/{episodes}, Reward: {total_reward}")
-
-    return best_grid, best_score
+    return best_grid, best_score, rewards
 
 # ✅ ฟังก์ชันจับเวลาการรัน
 
