@@ -11,7 +11,7 @@ import time
 # ตั้งค่าขนาด Grid
 GRID_ROWS = 4
 GRID_COLS = 3
-EPISODES = 100
+EPISODES = 15000
 ALPHA = 0.1
 GAMMA = 0.9
 SCORES = {'E': 10, 'G': 10, 'H': 15, 'R': 5, '0': 0}
@@ -42,15 +42,20 @@ def optimize_ratios():
 
 H_TYPE_RATIOS = optimize_ratios()
 
-def calculate_reward_verbose(grid, green_ratio_min=0.1):
+def calculate_reward_verbose(grid):
+    # ✅ กรณี grid เป็น None หรือว่าง
     if grid is None or len(grid) == 0 or len(grid[0]) == 0:
+        print(f"⚠️ Error: grid เป็น None หรือว่าง! กำลังใช้ Grid เปล่าแทน...")
         grid_size = 5
-        grid = np.full((grid_size, grid_size), '0')
+        grid = np.full((grid_size, grid_size), '0')  # ใช้ NumPy แทน List
 
     grid = np.array(grid)
     rows, cols = grid.shape
+
+    # ✅ คำนวณคะแนนพื้นฐาน
     base_score = sum(SCORES.get(cell, 0) for row in grid for cell in row)
 
+    # ✅ ตรวจสอบโบนัสจาก Pattern
     bonus = 0
     bonus += np.sum((grid[:, :-2] == 'H') & (grid[:, 1:-1] == 'H') & (grid[:, 2:] == 'H')) * 100
     bonus += np.sum((grid[:, :-2] == 'R') & (grid[:, 1:-1] == 'R') & (grid[:, 2:] == 'R')) * 100
@@ -60,43 +65,63 @@ def calculate_reward_verbose(grid, green_ratio_min=0.1):
     bonus += np.sum((grid[:-1, :-1] == 'R') & (grid[:-1, 1:] == 'R') &
                     (grid[1:, :-1] == 'H') & (grid[1:, 1:] == 'H')) * 100
 
+    # ✅ ค่าปรับเกี่ยวกับ E และ R
     penalty = 0
     h_positions = np.argwhere(grid == 'H')
     e_positions = np.argwhere(grid == 'E')
 
+    # ✅ 1) ตรวจสอบว่ามี H ที่ติดกับ E หรือไม่
+    #if len(h_positions) > 0 and len(e_positions) > 0:
+        #h_neighbors_e = np.sum([
+            #np.roll(grid == 'E', shift, axis=axis)[h_positions[:, 0], h_positions[:, 1]]
+            #for shift, axis in [(1, 0), (-1, 0), (1, 1), (-1, 1)]
+        #], axis=0)
+        #penalty -= 100 * np.sum(h_neighbors_e)  # ✅ ปรับค่าให้ลงโทษตามจำนวน H ที่ติด E
+
+    # ✅ 2) ตรวจสอบว่ามี E ที่ไม่ได้ติด R หรือไม่
     if len(e_positions) > 0:
         e_neighbors_r = np.any([
             np.roll(grid == 'R', shift, axis=axis)[e_positions[:, 0], e_positions[:, 1]]
             for shift, axis in [(1, 0), (-1, 0), (1, 1), (-1, 1)]
         ], axis=0)
+
         if not np.any(e_neighbors_r):
             penalty -= 200
 
+    # ✅ 3) ตรวจสอบจำนวนกลุ่ม R (ถนน)
     r_clusters = count_r_clusters(grid) if np.any(grid == 'R') else 0
     if r_clusters > 1:
         penalty -= 500 * (r_clusters - 1)
 
+    # ✅ 4) ตรวจสอบว่า H ทุกหลังติด R หรือไม่
     if len(h_positions) > 0:
         h_neighbors_r = np.any([
             np.roll(grid == 'R', shift, axis=axis)[h_positions[:, 0], h_positions[:, 1]]
             for shift, axis in [(1, 0), (-1, 0), (1, 1), (-1, 1)]
         ], axis=0)
-        penalty -= 200 * np.sum(~h_neighbors_r)
-        if np.all(h_neighbors_r):
+
+        penalty -= 200 * np.sum(~h_neighbors_r)  # ลงโทษบ้านที่ไม่ได้ติดถนน
+
+        if np.all(h_neighbors_r):  # ✅ ถ้าบ้านทุกหลังติดถนน ให้โบนัส
             bonus += 100
 
+    # ✅ ตรวจสอบสัดส่วนพื้นที่สีเขียว (G)
     total_cells = rows * cols
     num_green = np.sum(grid == 'G')
     green_ratio = num_green / total_cells
 
-    if green_ratio < green_ratio_min:
-        penalty -= 500
+    if green_ratio < 0.1:
+        penalty -= 500  # ✅ ปรับลดคะแนนหากพื้นที่สีเขียวน้อยเกินไป
 
+    # ✅ ตรวจสอบว่ามีถนนหรือไม่
     roads_exist = np.sum(grid == 'R') > 0
     if not roads_exist:
-        penalty -= 500
+        penalty -= 500  # ลงโทษหนักถ้าไม่มีถนน
 
+    # ✅ คำนวณคะแนนรวม
     total_score = base_score + bonus + penalty
+    #print(f"🎯 Debug: คะแนน Grid = {total_score} (Base: {base_score}, Bonus: {bonus}, Penalty: {penalty})")
+
     return total_score
 
 def count_r_clusters(grid, use_dfs=False):
@@ -296,19 +321,22 @@ def update_q_table(state, action, reward, next_state):
 
 # ✅ ฟังก์ชัน Train AI
 
-def train_ai(episodes, grid, green_ratio_min=0.1):
+def train_ai(episodes, grid):
+    """
+    ฝึก AI ด้วย Reinforcement Learning (Q-Learning)
+    """
     best_grid = None
     best_score = float('-inf')
-    rewards = []  # คะแนนทุกรอบ
-    top_layouts = []  # [(score, grid), ...]
 
     for episode in range(episodes):
-        state = [row[:] for row in grid]
+        state = [row[:] for row in grid]  # ใช้ Grid เดิมทุก Episode
+        total_reward = 0
 
         for _ in range(GRID_ROWS * GRID_COLS):
             action = choose_action(state)
+
             if action is None:
-                if any('0' in row for row in state):
+                if any('0' in row for row in state):  # ถ้ายังมี 0 ห้ามหยุด
                     continue
                 else:
                     break
@@ -316,22 +344,19 @@ def train_ai(episodes, grid, green_ratio_min=0.1):
             r, c, char = action
             state[r][c] = char
 
-            reward = calculate_reward_verbose(state, green_ratio_min)
+            reward = calculate_reward_verbose(state)
             update_q_table(state, action, reward, state)
 
-        total_reward = calculate_reward_verbose(state, green_ratio_min)
-        rewards.append(total_reward)
+        total_reward = calculate_reward_verbose(state)
 
-        # 🥇 เก็บ Top 3
-        top_layouts.append((total_reward, [row[:] for row in state]))
-        top_layouts = sorted(top_layouts, key=lambda x: x[0], reverse=True)[:3]
-
-        # 🎯 เก็บ Best Layout
         if total_reward > best_score:
             best_score = total_reward
             best_grid = [row[:] for row in state]
 
-    return best_grid, best_score, rewards, top_layouts
+        if (episode + 1) % 10000 == 0:
+            print(f"Episode {episode + 1}/{episodes}, Reward: {total_reward}")
+
+    return best_grid, best_score
 
 # ✅ ฟังก์ชันจับเวลาการรัน
 
@@ -392,7 +417,7 @@ grid, _ = load_or_initialize_grid(csv_folder, GRID_ROWS, GRID_COLS, new_e_positi
 
 print(f"✅ ขนาดของ Grid หลังโหลด: {len(grid)} rows x {len(grid[0]) if grid else 0} cols | ตำแหน่ง E: {new_e_position}")
 
-best_grid, best_score, rewards, top3, execution_time = measure_execution_time(train_ai, EPISODES, grid, green_ratio_min)
+best_grid, best_score, execution_time = measure_execution_time(train_ai, EPISODES, grid)
 final_layout = apply_house_types([row[:] for row in best_grid])
 
 print(f"📂 CSV Files Found: {csv_files}")
