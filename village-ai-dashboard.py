@@ -47,19 +47,38 @@ if st.sidebar.button("\U0001F680 เริ่มฝึก AI"):
     with st.spinner("กำลังโหลดหรือสร้าง Grid..."):
         grid, new_e = initialize_grid(rows, cols, e_position)
         grid, _ = load_or_initialize_grid(csv_folder, rows, cols, new_e)
-    
+
     st.success(f"โหลด Grid ขนาด {rows}x{cols} เรียบร้อยแล้ว | E ที่ {new_e}")
     render_colored_grid(grid, "\U0001F4CC แผนผังเริ่มต้น (ก่อนฝึก AI)")
 
     with st.spinner("⏳ กำลังฝึก AI..."):
-        best_grid, best_score, exec_time = measure_execution_time(train_ai, EPISODES, grid)
+        best_grid = None
+        best_score = float('-inf')
+        top3 = []
+        reward_per_episode = []
 
-    final_grid = apply_house_types([row[:] for row in best_grid])
+        for episode in range(EPISODES):
+            result, score = train_ai(1, grid)
+            reward_per_episode.append(score)
 
-    render_colored_grid(best_grid, "\U0001F3C6 ผังที่ดีที่สุดที่ AI หาได้")
+            if score > best_score:
+                best_score = score
+                best_grid = result
+                top3.append((score, [row[:] for row in result]))
+                top3 = sorted(top3, key=lambda x: -x[0])[:3]
+
+        exec_time = len(reward_per_episode)
+
     st.success(f"คะแนนสูงสุด: {best_score}")
-    st.info(f"⏱️ ใช้เวลาฝึกทั้งหมด: {exec_time:.2f} วินาที")
+    st.info(f"เทรนทั้งหมด {exec_time} รอบ")
 
+    options = [f"อันดับ {i+1} - คะแนน {s}" for i, (s, _) in enumerate(top3)]
+    selected = st.selectbox("เลือกผังที่ต้องการแสดง", options)
+    selected_grid = top3[options.index(selected)][1]
+
+    render_colored_grid(selected_grid, "\U0001F3C6 ผังที่เลือก")
+
+    final_grid = apply_house_types([row[:] for row in selected_grid])
     render_colored_grid(final_grid, "\U0001F4CC ผังหลังวาง H1–H4")
 
     st.subheader("\U0001F4CA วิเคราะห์ผลกำไร")
@@ -69,11 +88,11 @@ if st.sidebar.button("\U0001F680 เริ่มฝึก AI"):
     sys.stdout = sys.__stdout__
     st.text(buffer.getvalue())
 
-    # --- กราฟคะแนนต่อรอบ (mock data) ---
+    # --- กราฟคะแนนต่อรอบจริง ---
     st.subheader("\U0001F4C8 กราฟคะแนนต่อรอบ")
     reward_data = pd.DataFrame({
-        'Episode': list(range(1, 51)),
-        'Score': [random.randint(200, best_score) for _ in range(50)]
+        'Episode': list(range(1, exec_time + 1)),
+        'Score': reward_per_episode
     })
     st.line_chart(reward_data.set_index('Episode'))
 
