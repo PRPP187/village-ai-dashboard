@@ -441,7 +441,3 @@ for row in final_layout:
 
 save_q_table(Q_TABLE_FILE)
 analyze_profit(final_layout)
-
-print("\n📜 ACTION LOG (AI Placement):")
-for log in action_log[-20:]:  # แสดงท้าย ๆ พอประมาณ
-    print(log)
