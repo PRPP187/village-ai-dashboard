@@ -42,6 +42,19 @@ def optimize_ratios():
 
 H_TYPE_RATIOS = optimize_ratios()
 
+def save_q_table(filename="q_table.json"):
+    with open(filename, "w") as f:
+        json.dump(q_table, f)
+    print(f"💾 บันทึก Q-table ลงไฟล์: {filename}")
+
+def load_q_table(filename="q_table.json"):
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            return json.load(f)
+    else:
+        print(f"📁 ไม่พบไฟล์ Q-table เดิม: {filename}")
+        return {}
+
 def calculate_reward_verbose(grid):
     # ✅ กรณี grid เป็น None หรือว่าง
     if grid is None or len(grid) == 0 or len(grid[0]) == 0:
@@ -407,7 +420,8 @@ def analyze_profit(grid):
     print(f"🎯 กำไรปรับตาม market weight: {weighted_profit:,.2f} บาท")
 
 # ✅ ฝึก AI และบันทึกผลลัพธ์
-q_table = {}
+q_table = load_q_table(Q_TABLE_FILE)
+
 grid, new_e_position = initialize_grid(GRID_ROWS, GRID_COLS, E_START_POSITION)
 grid, _ = load_or_initialize_grid(csv_folder, GRID_ROWS, GRID_COLS, new_e_position)
 
@@ -425,6 +439,7 @@ print("\n📌 Final Layout with H1–H4:")
 for row in final_layout:
     print(" ".join(row))
 
+save_q_table(Q_TABLE_FILE)
 analyze_profit(final_layout)
 
 print("\n📜 ACTION LOG (AI Placement):")
