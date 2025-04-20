@@ -320,6 +320,7 @@ def choose_action(grid):
 # ✅ ฟังก์ชันอัปเดต Q-Table
 
 def update_q_table(state, action, reward, next_state):
+    global q_table
     state_str = json.dumps(state)
     action_str = str(tuple(action))
     next_state_str = json.dumps(next_state)
@@ -334,6 +335,7 @@ def update_q_table(state, action, reward, next_state):
 
 # ✅ ฟังก์ชัน Train AI (ปรับใหม่ให้ใช้ขนาด grid จริง)
 def train_ai(episodes, grid):
+    global q_table
     """
     ฝึก AI ด้วย Reinforcement Learning (Q-Learning) พร้อมบันทึกขั้นตอนสำหรับ debug
     """
