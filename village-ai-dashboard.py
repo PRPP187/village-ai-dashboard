@@ -12,7 +12,7 @@ st.set_page_config(page_title="Jecsu AI Village Planner", layout="wide")
 # --- Sidebar ---
 with st.sidebar:
     # ✅ ใช้โลโก้ล่าสุดที่คุณอัปโหลด
-    st.image("ChatGPT_Image_Apr_26__2025__11_50_45_AM-removebg-preview.png", width=200)
+    st.image("Jecsu logo.png", width=200)
     st.title("Configuration")
 
     rows = st.slider("Number of Rows", 3, 6, GRID_ROWS)
