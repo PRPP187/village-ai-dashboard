@@ -79,7 +79,7 @@ with st.sidebar:
     train_ai_clicked = st.button("🚀 Train AI")
 
 # --- Main Content ---
-st.markdown('<h1 style="text-align: center;">🏘️ Jecsu AI Village Planner</h1>', unsafe_allow_html=True)
+st.markdown('<h1 style="text-align: center;">Jecsu AI Village Planner</h1>', unsafe_allow_html=True)
 
 def render_colored_grid(grid, title):
     st.markdown(f"<h3 style='color:#6C63FF;'>{title}</h3>", unsafe_allow_html=True)
