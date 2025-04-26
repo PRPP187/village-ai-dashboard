@@ -19,7 +19,7 @@ st.markdown("""
 
         /* Sidebar Styling */
         [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #7B83FF 0%, #6A5ACD 100%);
+            background: linear-gradient(180deg, #7B83FF 0%, #2c2a3d 100%);
             border-top-right-radius: 20px;
             border-bottom-right-radius: 20px;
         }
