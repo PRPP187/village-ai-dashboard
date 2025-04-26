@@ -257,8 +257,7 @@ def update_q_table(state, action, reward, next_state):
 
 def train_ai(episodes, grid):
     global q_table
-    best_grid = None
-    best_score = float('-inf')
+    top_layouts = []
     action_log = []
 
     for episode in range(episodes):
@@ -279,14 +278,18 @@ def train_ai(episodes, grid):
             action_log.append(f"EP:{episode+1} STEP:{step+1} ➤ Placed '{char}' at ({r+1},{c+1}) [was '{prev}'] → Reward: {reward}")
 
         total_reward = calculate_reward_verbose(state)
-        if total_reward > best_score:
-            best_score = total_reward
-            best_grid = [row[:] for row in state]
 
-        if (episode + 1) % 10000 == 0:
-            print(f"Episode {episode + 1}/{episodes}, Reward: {total_reward}")
+        if len(top_layouts) < 3:
+            top_layouts.append((total_reward, [row[:] for row in state]))
+        else:
+            min_score = min(top_layouts, key=lambda x: x[0])[0]
+            if total_reward > min_score:
+                top_layouts = sorted(top_layouts, key=lambda x: x[0], reverse=True)
+                top_layouts[-1] = (total_reward, [row[:] for row in state])
 
-    return best_grid, best_score, action_log
+    top_layouts = sorted(top_layouts, key=lambda x: x[0], reverse=True)
+    return top_layouts, action_log
+
 
 def analyze_profit(grid):
     summary = {k: 0 for k in HOUSE_PRICES}
@@ -315,23 +318,34 @@ def analyze_profit(grid):
     print(f"🎯 Weighted Profit (Market Preference): {weighted_profit:,.2f}")
 
 # Execute AI
+# Load or initialize Q-table
 q_table = load_q_table(Q_TABLE_FILE)
+
+# Generate or load grid
 grid, new_e_position = initialize_grid(GRID_ROWS, GRID_COLS, E_START_POSITION)
 grid, _ = load_or_initialize_grid(csv_folder, GRID_ROWS, GRID_COLS, new_e_position)
 
-print(f"✅ Grid size: {len(grid)} rows x {len(grid[0]) if grid else 0} cols | E Position: {new_e_position}")
+print(f"\n✅ Grid size: {len(grid)} rows x {len(grid[0]) if grid else 0} cols | E Position: {new_e_position}")
 
-best_grid, best_score, action_log = train_ai(EPISODES, grid)
-final_layout = apply_house_types([row[:] for row in best_grid])
+# Train and get top 3 layouts
+top_layouts, action_log = train_ai(EPISODES, grid)
 
-print("\n🏆 Best Layout Found:")
-for row in best_grid:
-    print(" ".join(row))
-print(f"\n✅ Best Score Achieved: {best_score}")
+# Show all top 3 layouts
+for i, (score, layout) in enumerate(top_layouts, 1):
+    print(f"\n🏆 Layout #{i} — Raw Score: {score}")
+    for row in layout:
+        print(" ".join(row))
 
-print("\n📌 Final Layout with House Types:")
-for row in final_layout:
-    print(" ".join(row))
+    final_layout = apply_house_types([r[:] for r in layout])
+    print(f"\n📌 Layout #{i} with H1–H4:")
+    for row in final_layout:
+        print(" ".join(row))
 
+    print(f"\n💡 Profit Analysis for Layout #{i}:")
+    analyze_profit(final_layout)
+    print("\n" + "-" * 50)
+
+# Save Q-table
 save_q_table(Q_TABLE_FILE)
+
 analyze_profit(final_layout)
