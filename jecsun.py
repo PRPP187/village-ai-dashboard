@@ -291,34 +291,41 @@ def train_ai(episodes, grid):
     return top_layouts, action_log
 
 
-def analyze_profit(grid):
-    summary = {k: 0 for k in HOUSE_PRICES}
-    total_cost = total_sale = total_size = weighted_profit = 0
-    for row in grid:
-        for cell in row:
-            if cell in HOUSE_PRICES:
-                info = HOUSE_PRICES[cell]
-                summary[cell] += 1
-                total_cost += info['cost']
-                total_sale += info['sale']
-                total_size += info['size']
-                weighted_profit += (info['sale'] - info['cost']) * info['weight']
-    total_profit = total_sale - total_cost
-    avg_profit_per_sqm = total_profit / total_size if total_size else 0
-    total_units = sum(summary.values())
-    for htype, count in summary.items():
-        if count:
-            info = HOUSE_PRICES[htype]
-            ratio_percent = (count / total_units) * 100
-            print(f"🏠 {htype}: {count} units | {ratio_percent:.1f}% | Cost/unit: {info['cost']:,} | Sale/unit: {info['sale']:,} | Total sale: {info['sale'] * count:,}")
-    print(f"\n💸 Total Construction Cost: {total_cost:,}")
-    print(f"💰 Total Revenue: {total_sale:,}")
-    print(f"📈 Total Profit: {total_profit:,}")
-    print(f"📐 Average Profit per sqm: {avg_profit_per_sqm:,.2f}")
-    print(f"🎯 Weighted Profit (Market Preference): {weighted_profit:,.2f}")
+def analyze_profits(top_layouts):
+    for i, (score, grid) in enumerate(top_layouts, 1):
+        summary = {k: 0 for k in HOUSE_PRICES}
+        total_cost = total_sale = total_size = weighted_profit = 0
+
+        for row in grid:
+            for cell in row:
+                if cell in HOUSE_PRICES:
+                    info = HOUSE_PRICES[cell]
+                    summary[cell] += 1
+                    total_cost += info['cost']
+                    total_sale += info['sale']
+                    total_size += info['size']
+                    weighted_profit += (info['sale'] - info['cost']) * info['weight']
+
+        total_profit = total_sale - total_cost
+        avg_profit_per_sqm = total_profit / total_size if total_size else 0
+        total_units = sum(summary.values())
+
+        print(f"\n🔷 Profit Analysis for Layout #{i} (Raw Score: {score})")
+        for htype, count in summary.items():
+            if count:
+                info = HOUSE_PRICES[htype]
+                ratio_percent = (count / total_units) * 100
+                print(f"🏠 {htype}: {count} units | {ratio_percent:.1f}% | Cost/unit: {info['cost']:,} | Sale/unit: {info['sale']:,} | Total sale: {info['sale'] * count:,}")
+
+        print(f"\n💸 Total Construction Cost: {total_cost:,}")
+        print(f"💰 Total Revenue: {total_sale:,}")
+        print(f"📈 Total Profit: {total_profit:,}")
+        print(f"📐 Average Profit per sqm: {avg_profit_per_sqm:,.2f}")
+        print(f"🎯 Weighted Profit (Market Preference): {weighted_profit:,.2f}")
+        print("\n" + "-"*50)
+
 
 # Execute AI
-# Load or initialize Q-table
 q_table = load_q_table(Q_TABLE_FILE)
 
 # Generate or load grid
@@ -331,21 +338,24 @@ print(f"\n✅ Grid size: {len(grid)} rows x {len(grid[0]) if grid else 0} cols |
 top_layouts, action_log = train_ai(EPISODES, grid)
 
 # Show all top 3 layouts
+final_layouts = []
 for i, (score, layout) in enumerate(top_layouts, 1):
     print(f"\n🏆 Layout #{i} — Raw Score: {score}")
     for row in layout:
         print(" ".join(row))
 
     final_layout = apply_house_types([r[:] for r in layout])
+    final_layouts.append((score, final_layout))
+
     print(f"\n📌 Layout #{i} with H1–H4:")
     for row in final_layout:
         print(" ".join(row))
 
-    print(f"\n💡 Profit Analysis for Layout #{i}:")
-    analyze_profit(final_layout)
-    print("\n" + "-" * 50)
+    print("\n" + "-"*50)
 
 # Save Q-table
 save_q_table(Q_TABLE_FILE)
 
-analyze_profit(final_layout)
+# Analyze all 3 layouts together
+analyze_profits(final_layouts)
+
