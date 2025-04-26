@@ -6,22 +6,63 @@ import io
 import sys
 from jecsun import initialize_grid, load_or_initialize_grid, train_ai, apply_house_types, analyze_profit, GRID_ROWS, GRID_COLS, E_START_POSITION, EPISODES, csv_folder
 
-st.set_page_config(page_title="🏘️ AI Village Planner", layout="wide")
+# --- Basic Page Config ---
+st.set_page_config(page_title="Jecsu AI Village Planner", layout="wide")
 
-# --- Header Section ---
+# --- Inject Custom CSS ---
 st.markdown("""
-    <h1 style='text-align: center; color: #6C63FF;'>🏘️ Smart Village Layout AI</h1>
-    <p style='text-align: center; font-size: 18px; color: #999;'>Powered by Q-Learning Algorithm • Real Estate Optimization</p>
-    <hr>
+    <style>
+        .stApp {
+            background-color: #F9FAFB;
+        }
+        [data-testid="stSidebar"] {
+            background-color: #6C63FF;
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        .sidebar-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #FFFFFF;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: #FFFFFF;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        h1, h2, h3 {
+            color: #6C63FF;
+        }
+        .stButton>button {
+            background: linear-gradient(90deg, #6C63FF 0%, #8E2DE2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0.6em 2em;
+            font-weight: bold;
+        }
+    </style>
 """, unsafe_allow_html=True)
 
 # --- Sidebar ---
-st.sidebar.header("🔧 Configuration")
-rows = st.sidebar.slider("Number of Rows", 3, 6, GRID_ROWS)
-cols = st.sidebar.slider("Number of Columns", 3, 6, GRID_COLS)
-e_row = st.sidebar.number_input("E Position (Row, 1-based)", 1, rows, E_START_POSITION[0])
-e_col = st.sidebar.number_input("E Position (Col, 1-based)", 1, cols, E_START_POSITION[1])
-e_position = (e_row, e_col)
+with st.sidebar:
+    st.image("ChatGPT_Image_Apr_26__2025__11_50_45_AM-removebg-preview.png", width=180)  # เปลี่ยนชื่อไฟล์ตามที่มีจริง
+    st.markdown('<div class="sidebar-title">Configuration</div>', unsafe_allow_html=True)
+
+    rows = st.slider("Number of Rows", 3, 6, GRID_ROWS)
+    cols = st.slider("Number of Columns", 3, 6, GRID_COLS)
+    e_row = st.number_input("E Position (Row, 1-based)", 1, rows, E_START_POSITION[0])
+    e_col = st.number_input("E Position (Col, 1-based)", 1, cols, E_START_POSITION[1])
+    e_position = (e_row, e_col)
+
+    train_ai_clicked = st.button("🚀 Train AI")
+
+# --- Main Content ---
+st.markdown('<h1 style="text-align: center;">🏘️ Jecsu AI Village Planner</h1>', unsafe_allow_html=True)
 
 def render_colored_grid(grid, title):
     st.markdown(f"<h3 style='color:#6C63FF;'>{title}</h3>", unsafe_allow_html=True)
@@ -47,30 +88,47 @@ def render_colored_grid(grid, title):
     html += "</table>"
     st.markdown(html, unsafe_allow_html=True)
 
-# --- Main AI Training Logic ---
-if st.sidebar.button("🚀 Train AI"):
+# --- AI Process ---
+if train_ai_clicked:
     with st.spinner("Initializing Grid..."):
         grid, new_e = initialize_grid(rows, cols, e_position)
         grid, _ = load_or_initialize_grid(csv_folder, rows, cols, new_e)
 
-    st.success(f"Grid Loaded: {rows}x{cols} | Start Position: {new_e}")
-    render_colored_grid(grid, "📌 Initial Layout (Before AI)")
+    with st.container():
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.success(f"Grid Loaded: {rows}x{cols} | Start Position: {new_e}")
+        render_colored_grid(grid, "📌 Initial Layout (Before AI)")
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with st.spinner("🧠 Training AI... Please wait..."):
         best_grid, best_score, action_log = train_ai(EPISODES, grid)
 
-    final_grid = apply_house_types([row[:] for row in best_grid])
-    render_colored_grid(best_grid, "🏆 Best Layout Found by AI")
-    st.success(f"Best Score Achieved: {best_score}")
-    render_colored_grid(final_grid, "📌 Final Layout with House Types (H1–H4)")
+    with st.container():
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        render_colored_grid(best_grid, "🏆 Best Layout Found by AI")
+        st.success(f"Best Score Achieved: {best_score}")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    st.subheader("📊 Profitability Analysis")
-    buffer = io.StringIO()
-    sys.stdout = buffer
-    analyze_profit(final_grid)
-    sys.stdout = sys.__stdout__
-    st.text(buffer.getvalue())
+    final_grid = apply_house_types([row[:] for row in best_grid])
+
+    with st.container():
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        render_colored_grid(final_grid, "📌 Final Layout with House Types (H1–H4)")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with st.container():
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.subheader("📊 Profitability Analysis")
+        buffer = io.StringIO()
+        sys.stdout = buffer
+        analyze_profit(final_grid)
+        sys.stdout = sys.__stdout__
+        st.text(buffer.getvalue())
+        st.markdown('</div>', unsafe_allow_html=True)
 
     st.balloons()
 else:
-    st.info("👈 Please configure settings and press 'Train AI'")
+    with st.container():
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.info("👈 Please configure settings and press 'Train AI' to start.")
+        st.markdown('</div>', unsafe_allow_html=True)
