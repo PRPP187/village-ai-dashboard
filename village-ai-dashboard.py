@@ -24,7 +24,6 @@ st.markdown("""
             border-bottom-right-radius: 20px;
         }
 
-        /* Sidebar Elements */
         .sidebar-title {
             font-size: 22px;
             font-weight: bold;
@@ -52,6 +51,15 @@ st.markdown("""
             color: #6C63FF;
         }
 
+        /* Slider/NumberInput สีข้อความ */
+        .stSlider > div[data-testid="stTickBar"] > div {
+            color: white !important;
+        }
+
+        .stSlider label, .stNumberInput label {
+            color: #FFFFFF !important;
+        }
+
         /* Button Custom */
         .stButton>button {
             background: linear-gradient(90deg, #7B83FF 0%, #6A5ACD 100%);
@@ -64,10 +72,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
 # --- Sidebar ---
 with st.sidebar:
-    st.image("ChatGPT_Image_Apr_26__2025__11_50_45_AM-removebg-preview.png", width=180)  # เปลี่ยนชื่อไฟล์ตามที่มีจริง
+    st.image("ChatGPT_Image_Apr_26__2025__11_50_45_AM-removebg-preview.png", width=180)
     st.markdown('<div class="sidebar-title">Configuration</div>', unsafe_allow_html=True)
 
     rows = st.slider("Number of Rows", 3, 6, GRID_ROWS)
@@ -78,9 +85,10 @@ with st.sidebar:
 
     train_ai_clicked = st.button("🚀 Train AI")
 
-# --- Main Content ---
+# --- Main Title ---
 st.markdown('<h1 style="text-align: center;">Jecsu AI Village Planner</h1>', unsafe_allow_html=True)
 
+# --- Grid Renderer ---
 def render_colored_grid(grid, title):
     st.markdown(f"<h3 style='color:#6C63FF;'>{title}</h3>", unsafe_allow_html=True)
     color_map = {
@@ -105,15 +113,20 @@ def render_colored_grid(grid, title):
     html += "</table>"
     st.markdown(html, unsafe_allow_html=True)
 
-# --- AI Process ---
+# --- Main Logic ---
 if train_ai_clicked:
     with st.spinner("Initializing Grid..."):
         grid, new_e = initialize_grid(rows, cols, e_position)
         grid, _ = load_or_initialize_grid(csv_folder, rows, cols, new_e)
 
+    # 💡 Initial Layout Section (รวม Grid Loaded เข้าใน card นี้)
     with st.container():
         st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.success(f"Grid Loaded: {rows}x{cols} | Start Position: {new_e}")
+        st.markdown(f"""
+            <div style='background-color: #2E8B57; padding: 10px; border-radius: 10px; color: white; margin-bottom: 10px;'>
+                ✅ Grid Loaded: {rows}x{cols} | Start Position: {new_e}
+            </div>
+        """, unsafe_allow_html=True)
         render_colored_grid(grid, "📌 Initial Layout (Before AI)")
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -144,6 +157,7 @@ if train_ai_clicked:
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.balloons()
+
 else:
     with st.container():
         st.markdown('<div class="card">', unsafe_allow_html=True)
