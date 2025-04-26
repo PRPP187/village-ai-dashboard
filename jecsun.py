@@ -29,6 +29,15 @@ HOUSE_PRICES = {
 
 os.makedirs(save_folder, exist_ok=True)
 
+def get_grid_value(grid, r, c):
+    """ Helper: Get value from grid with boundary checking """
+    rows, cols = len(grid), len(grid[0])
+    if 0 <= r < rows and 0 <= c < cols:
+        return grid[r][c]
+    else:
+        return None
+
+
 def optimize_ratios():
     ratios = {}
     total = sum((p['sale'] - p['cost']) * p['weight'] for p in HOUSE_PRICES.values())
