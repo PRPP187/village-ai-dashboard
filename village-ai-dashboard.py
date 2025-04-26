@@ -91,7 +91,7 @@ if train_ai_clicked:
     render_colored_grid(grid, "📌 Initial Layout (Before Training)")
 
     with st.spinner("🧠 Training AI... Please wait..."):
-        top_layouts, training_time_sec = train_ai(EPISODES, grid)
+        top_layouts, training_time_sec = train_ai(EPISODES, grid, new_e_position)
 
     best_score, best_grid = top_layouts[0]
 
