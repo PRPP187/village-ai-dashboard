@@ -12,14 +12,19 @@ st.set_page_config(page_title="Jecsu AI Village Planner", layout="wide")
 # --- Inject Custom CSS ---
 st.markdown("""
     <style>
+        /* Background Color */
         .stApp {
-            background-color: #F9FAFB;
+            background-color: #F5F7FA;
         }
+
+        /* Sidebar Styling */
         [data-testid="stSidebar"] {
-            background-color: #6C63FF;
+            background: linear-gradient(180deg, #7B83FF 0%, #6A5ACD 100%);
             border-top-right-radius: 20px;
             border-bottom-right-radius: 20px;
         }
+
+        /* Sidebar Elements */
         .sidebar-title {
             font-size: 22px;
             font-weight: bold;
@@ -27,18 +32,29 @@ st.markdown("""
             text-align: center;
             margin-bottom: 20px;
         }
+
+        .sidebar-content {
+            font-size: 16px;
+            color: #FFFFFF;
+        }
+
+        /* Card Style */
         .card {
             background-color: #FFFFFF;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             margin-bottom: 30px;
         }
+
+        /* Title Style */
         h1, h2, h3 {
             color: #6C63FF;
         }
+
+        /* Button Custom */
         .stButton>button {
-            background: linear-gradient(90deg, #6C63FF 0%, #8E2DE2 100%);
+            background: linear-gradient(90deg, #7B83FF 0%, #6A5ACD 100%);
             color: white;
             border: none;
             border-radius: 10px;
@@ -47,6 +63,7 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
+
 
 # --- Sidebar ---
 with st.sidebar:
