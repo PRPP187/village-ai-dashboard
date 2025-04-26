@@ -21,6 +21,17 @@ with st.sidebar:
     e_position = (e_row, e_col)
     train_ai_clicked = st.button("🚀 Train AI")
 
+# --- Intro Section ---
+st.markdown("""
+    <div style='text-align: center; margin-bottom: 30px;'>
+        <h1 style='color:#F8F8F8;'>🏘️ Jecsu AI Village Planner</h1>
+        <p style='color:#BBBBBB; font-size:18px;'>
+            An intelligent layout optimization tool powered by Q-Learning.<br>
+            This AI learns how to plan roads, green zones, and house types to maximize profit and connectivity.
+        </p>
+    </div>
+""", unsafe_allow_html=True)
+
 # --- Grid Rendering ---
 def render_colored_grid(grid, title):
     st.subheader(title)
