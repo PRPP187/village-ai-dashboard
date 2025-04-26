@@ -94,21 +94,93 @@ def load_or_initialize_grid(csv_folder, rows, cols, e_position):
     return initialize_grid(rows, cols, e_position)
 
 def calculate_reward_verbose(grid):
-    grid = np.array(grid)
-    base_score = sum({'E':10,'G':10,'H':15,'R':5,'0':0}.get(cell, 0) for row in grid for cell in row)
+    """ ✅ คำนวณคะแนนของแผนที่ โดยพิจารณาจากบ้าน ถนน พื้นที่สีเขียว และพื้นที่เชิงพาณิชย์ """
+    
+    # ✅ กรณีที่ Grid เป็น None หรือว่าง
+    if grid is None or len(grid) == 0 or len(grid[0]) == 0:
+        print(f"⚠️ Error: grid เป็น None หรือว่าง! กำลังใช้ Grid เปล่าแทน...")
+        grid_size = 5
+        grid = np.full((grid_size, grid_size), '0')
 
-    bonus, penalty = 0, 0
+    grid = np.array(grid)
     rows, cols = grid.shape
 
-    bonus += np.sum((grid[:, :-2] == 'H') & (grid[:, 1:-1] == 'H') & (grid[:, 2:] == 'H')) * 100
-    bonus += np.sum((grid[:, :-2] == 'R') & (grid[:, 1:-1] == 'R') & (grid[:, 2:] == 'R')) * 100
+    # ✅ คำนวณคะแนนพื้นฐาน (Base Score)
+    SCORES = {'H': 50, 'R': 20, 'E': 100, 'G': 10}
+    base_score = sum(SCORES.get(cell, 0) for row in grid for cell in row)
 
-    if np.sum(grid == 'G') / (rows * cols) < 0.1:
-        penalty -= 500
-    if np.sum(grid == 'R') == 0:
-        penalty -= 500
+    # ✅ โบนัส (Bonus)
+    bonus = 0
+    bonus_details = {}
 
-    return base_score + bonus + penalty
+    # ✅ โบนัส +50 ถ้าบ้าน (H) อยู่ที่ขอบ
+    h_positions = np.argwhere(grid == 'H')
+    edge_houses = np.sum((h_positions[:, 0] == 0) | (h_positions[:, 0] == rows - 1) |
+                          (h_positions[:, 1] == 0) | (h_positions[:, 1] == cols - 1))
+    bonus_details["H ติดขอบ"] = edge_houses * 50
+    bonus += edge_houses * 50
+
+    # ✅ โบนัสจาก Pattern
+    bonus_details["HHH"] = np.sum((grid[:, :-2] == 'H') & (grid[:, 1:-1] == 'H') & (grid[:, 2:] == 'H')) * 100
+    bonus_details["RRR"] = np.sum((grid[:, :-2] == 'R') & (grid[:, 1:-1] == 'R') & (grid[:, 2:] == 'R')) * 100
+    bonus_details["H-R-H"] = np.sum((grid[:-2, :] == 'H') & (grid[1:-1, :] == 'R') & (grid[2:, :] == 'H')) * 100
+
+    # ✅ เพิ่มโบนัสใหม่
+    bonus_details["RR-HH"] = np.sum(
+        (grid[:-1, :] == 'R') & (grid[1:, :] == 'R') & 
+        (grid[:-1, :] == 'H') & (grid[1:, :] == 'H')
+    ) * 100
+
+    bonus_details["HR-HR"] = np.sum(
+        (grid[:, :-1] == 'H') & (grid[:, 1:] == 'H') & 
+        (grid[:, :-1] == 'R') & (grid[:, 1:] == 'R')
+    ) * 100
+
+    for k, v in bonus_details.items():
+        bonus += v  
+
+    # ✅ ค่าปรับ (Penalty)
+    penalty = 0
+    penalty_details = {}
+
+    # ✅ ตรวจสอบว่าบ้าน (`H`) เชื่อมต่อกับถนน (`R`) หรือไม่
+    h_neighbors_r = np.any([
+        np.roll(grid == 'R', shift, axis=axis)[h_positions[:, 0], h_positions[:, 1]]
+        for shift, axis in [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    ], axis=0)
+    num_h_not_connected = np.count_nonzero(~h_neighbors_r)
+    penalty_details["H ไม่ติดถนน"] = -100 * num_h_not_connected
+    penalty -= 300 * num_h_not_connected
+
+    # ✅ ตรวจสอบ `E` ที่ไม่ติดถนน `-1000`
+    e_positions = np.argwhere(grid == 'E')
+    e_neighbors_r = np.any([
+        np.roll(grid == 'R', shift, axis=axis)[e_positions[:, 0], e_positions[:, 1]]
+        for shift, axis in [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    ], axis=0)
+    num_e_not_connected = np.count_nonzero(~e_neighbors_r)
+    penalty_details["E ไม่ติดถนน"] = -1000 * num_e_not_connected
+    penalty -= 1000 * num_e_not_connected
+
+    # ✅ ตรวจสอบค่าปรับใหม่
+    penalty_details["HH-RR"] = -np.sum(
+        (grid[:-1, :] == 'H') & (grid[1:, :] == 'H') & 
+        (grid[:-1, :] == 'R') & (grid[1:, :] == 'R')
+    ) * 50
+
+    penalty_details["RH-RH"] = -np.sum(
+        (grid[:, :-1] == 'R') & (grid[:, 1:] == 'R') & 
+        (grid[:, :-1] == 'H') & (grid[:, 1:] == 'H')
+    ) * 50
+
+    penalty += penalty_details["HH-RR"]
+    penalty += penalty_details["RH-RH"]
+
+    # ✅ คำนวณคะแนนรวม
+    total_score = base_score + bonus + penalty
+    print(f"🎯 Debug: คะแนน Grid = {total_score} (Base: {base_score}, Bonus: {bonus}, Penalty: {penalty})")
+
+    return total_score
 
 def apply_house_types(grid):
     h_positions = [(r, c) for r in range(len(grid)) for c in range(len(grid[0])) if grid[r][c] == 'H']
@@ -130,13 +202,58 @@ def apply_house_types(grid):
         grid[r][c] = h
     return grid
 
-def choose_action(grid):
-    empty = [(r, c) for r in range(len(grid)) for c in range(len(grid[0])) if grid[r][c] == '0']
-    if not empty:
-        return None
-    r, c = random.choice(empty)
-    char = random.choice(['H', 'R', 'G'])
-    return r, c, char
+def choose_action(grid, e_position, epsilon=0.1):
+    """ ✅ เลือกจุดวางแบบ BFS (จิ๊กซอ) และเลือกอาคารที่ให้โบนัสแพทเทิร์นสูงสุด """
+    if not isinstance(grid, np.ndarray):
+        grid = np.array(grid)
+
+    rows, cols = grid.shape
+    visited = set()
+    queue = deque([e_position])
+    build_order = []
+
+    while queue:
+        r, c = queue.popleft()
+        if (r, c) in visited:
+            continue
+        visited.add((r, c))
+
+        if get_grid_value(grid, r, c) == '0':
+            build_order.append((r, c))
+
+        for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in visited:
+                queue.append((nr, nc))
+
+    if not build_order:
+        return None  # ถ้ากริดเต็มแล้ว ไม่ต้องเลือก action ใหม่
+
+    # ✅ ถ้าอยู่ในช่วง Exploration (สุ่มเลือก)
+    if random.random() < epsilon:
+        r, c = random.choice(build_order)
+        chosen = random.choices(['H', 'R', 'G'], weights=[0.5, 0.3, 0.2])[0]  # ✅ ปรับความน่าจะเป็น
+        return r, c, chosen
+
+    # ✅ ใช้คะแนนจาก Q-Table หรือ Reward System ในการเลือกอาคาร
+    best_score = float('-inf')
+    best_choice = None
+    best_position = None
+
+    for r, c in build_order:
+        for option in ['H', 'R', 'G']:
+            temp_grid = grid.copy()
+            temp_grid[r, c] = option  # ✅ ทดลองวาง
+
+            # ✅ ลดการเรียก calculate_reward_verbose() บ่อยเกินไป
+            score = calculate_reward_verbose(temp_grid)  
+
+            if score > best_score:
+                best_score = score
+                best_choice = option
+                best_position = (r, c)
+
+    return best_position[0], best_position[1], best_choice if best_choice else random.choice(['H', 'R', 'G'])
 
 def update_q_table(state, action, reward, next_state):
     global q_table
