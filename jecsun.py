@@ -269,7 +269,7 @@ def update_q_table(state, action, reward, next_state):
     max_future = max(q_table.get(next_state_str, {}).values() or [0])
     q_table[state_str][action_str] = (1-ALPHA)*q_table[state_str][action_str] + ALPHA*(reward + GAMMA*max_future)
 
-def train_ai(episodes, grid):
+def train_ai(episodes, grid, e_position):
     global q_table
     top_layouts = []
     start_time = time.time()
