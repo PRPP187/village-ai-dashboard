@@ -6,68 +6,78 @@ import io
 import sys
 from jecsun import initialize_grid, load_or_initialize_grid, train_ai, apply_house_types, analyze_profit, GRID_ROWS, GRID_COLS, E_START_POSITION, EPISODES, csv_folder
 
-# --- Basic Page Config ---
+# --- Page Config ---
 st.set_page_config(page_title="Jecsu AI Village Planner", layout="wide")
 
-# --- Inject Custom CSS ---
+# --- Custom Theme CSS ---
 st.markdown("""
     <style>
-        /* Background Color */
+        /* Global Theme */
         .stApp {
-            background-color: #131314;
+            background-color: #1e1e2f;
+            color: #F5F7FA;
         }
 
-        /* Sidebar Styling */
+        html, body, [class*="css"] {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Sidebar Style */
         [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #7B83FF 0%, #2c2a3d 100%);
+            background: linear-gradient(180deg, #7B83FF 0%, #4B4C7C 100%);
             border-top-right-radius: 20px;
             border-bottom-right-radius: 20px;
+            color: white;
         }
 
         .sidebar-title {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: bold;
-            color: #FFFFFF;
+            color: #F5F7FA;
             text-align: center;
             margin-bottom: 20px;
         }
 
-        .sidebar-content {
-            font-size: 16px;
-            color: #FFFFFF;
-        }
-
-        /* Card Style */
-        .card {
-            background-color: #FFFFFF;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 30px;
-        }
-
-        /* Title Style */
-        h1, h2, h3 {
-            color: #6C63FF;
-        }
-
-        /* Slider/NumberInput สีข้อความ */
-        .stSlider > div[data-testid="stTickBar"] > div {
-            color: white !important;
-        }
-
-        .stSlider label, .stNumberInput label {
+        .stSlider > div[data-testid="stTickBar"] > div,
+        .stSlider label,
+        .stNumberInput label,
+        .stTextInput label {
             color: #FFFFFF !important;
         }
 
-        /* Button Custom */
+        /* Button */
         .stButton>button {
-            background: linear-gradient(90deg, #7B83FF 0%, #6A5ACD 100%);
+            background: linear-gradient(90deg, #7B83FF, #6C63FF);
             color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 0.6em 2em;
             font-weight: bold;
+            padding: 0.6em 2em;
+            border: none;
+            border-radius: 12px;
+        }
+
+        /* Card Container */
+        .card {
+            background-color: #2a2a3f;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        /* Headers */
+        h1, h2, h3 {
+            color: #B6A9F2;
+        }
+
+        /* Info bar inside card */
+        .grid-label {
+            background-color: #4B4C7C;
+            padding: 10px;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -85,17 +95,17 @@ with st.sidebar:
 
     train_ai_clicked = st.button("🚀 Train AI")
 
-# --- Main Title ---
+# --- Title ---
 st.markdown('<h1 style="text-align: center;">Jecsu AI Village Planner</h1>', unsafe_allow_html=True)
 
-# --- Grid Renderer ---
+# --- Grid Rendering ---
 def render_colored_grid(grid, title):
-    st.markdown(f"<h3 style='color:#6C63FF;'>{title}</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='color:#B6A9F2;'>{title}</h3>", unsafe_allow_html=True)
     color_map = {
-        'E': '#FFD700',   # Entry (Gold)
-        'R': '#A9A9A9',   # Road (Grey)
-        'G': '#98FB98',   # Green (Light green)
-        'H': '#FFB6C1',   # House base (Pink)
+        'E': '#FFD700',   # Entry
+        'R': '#A9A9A9',   # Road
+        'G': '#98FB98',   # Green
+        'H': '#FFB6C1',   # House
         'H1': '#FFA07A',
         'H2': '#F08080',
         'H3': '#FA8072',
@@ -119,14 +129,9 @@ if train_ai_clicked:
         grid, new_e = initialize_grid(rows, cols, e_position)
         grid, _ = load_or_initialize_grid(csv_folder, rows, cols, new_e)
 
-    # 💡 Initial Layout Section (รวม Grid Loaded เข้าใน card นี้)
     with st.container():
         st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown(f"""
-            <div style='background-color: #2E8B57; padding: 10px; border-radius: 10px; color: white; margin-bottom: 10px;'>
-                ✅ Grid Loaded: {rows}x{cols} | Start Position: {new_e}
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f'<div class="grid-label">✅ Grid Loaded: {rows}x{cols} | Start Position: {new_e}</div>', unsafe_allow_html=True)
         render_colored_grid(grid, "📌 Initial Layout (Before AI)")
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -136,7 +141,7 @@ if train_ai_clicked:
     with st.container():
         st.markdown('<div class="card">', unsafe_allow_html=True)
         render_colored_grid(best_grid, "🏆 Best Layout Found by AI")
-        st.success(f"Best Score Achieved: {best_score}")
+        st.markdown(f'<div class="grid-label">Best Score Achieved: {best_score}</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     final_grid = apply_house_types([row[:] for row in best_grid])
@@ -157,7 +162,6 @@ if train_ai_clicked:
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.balloons()
-
 else:
     with st.container():
         st.markdown('<div class="card">', unsafe_allow_html=True)
