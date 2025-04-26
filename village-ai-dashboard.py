@@ -53,7 +53,9 @@ if train_ai_clicked:
     render_colored_grid(grid, "📌 Initial Layout (Before AI)")
 
     with st.spinner("🧠 Training AI... Please wait..."):
-        best_grid, best_score, action_log = train_ai(EPISODES, grid)
+        top_layouts, action_log = train_ai(EPISODES, grid)
+        best_score, best_grid = top_layouts[0]
+
 
     render_colored_grid(best_grid, "🏆 Best Layout Found by AI")
     st.success(f"Best Score Achieved: {best_score}")
