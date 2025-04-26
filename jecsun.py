@@ -277,7 +277,7 @@ def train_ai(episodes, grid):
     for _ in range(episodes):
         state = [row[:] for row in grid]
         for _ in range(len(state)*len(state[0])):
-            action = choose_action(state)
+            action = choose_action(state, e_position)
             if action is None:
                 break
             r,c,char = action
