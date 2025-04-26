@@ -11,7 +11,10 @@ st.set_page_config(page_title="Jecsu AI Village Planner", layout="wide")
 
 # --- Sidebar ---
 with st.sidebar:
+    # 🔻 ใส่โลโก้ Jecsu AI
+    st.image("ChatGPT_Image_Apr_26__2025__11_50_45_AM-removebg-preview.png", width=180)  # เปลี่ยนชื่อไฟล์ตามของคุณ
     st.title("Configuration")
+
     rows = st.slider("Number of Rows", 3, 6, GRID_ROWS)
     cols = st.slider("Number of Columns", 3, 6, GRID_COLS)
     e_row = st.number_input("E Position (Row, 1-based)", 1, rows, E_START_POSITION[0])
