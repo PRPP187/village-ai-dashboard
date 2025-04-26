@@ -9,9 +9,9 @@ from collections import deque
 import time
 
 # ตั้งค่าขนาด Grid
-GRID_ROWS = 4
-GRID_COLS = 4
-EPISODES = 10000
+GRID_ROWS = 3
+GRID_COLS = 3
+EPISODES = 50000
 ALPHA = 0.1
 GAMMA = 0.9
 SCORES = {'E': 10, 'G': 10, 'H': 15, 'R': 5, '0': 0}
