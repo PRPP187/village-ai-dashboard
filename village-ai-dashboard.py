@@ -80,9 +80,7 @@ if train_ai_clicked:
 
     with st.spinner("🧠 Training AI... Please wait..."):
         top_layouts, action_log = train_ai(EPISODES, grid)
-        best_score, best_grid = top_layouts[0]
 
-    # Apply house types to all layouts
     final_layouts = []
     for score, layout in top_layouts:
         final_layout = apply_house_types([row[:] for row in layout])
@@ -90,22 +88,14 @@ if train_ai_clicked:
 
     st.success("✅ AI Training Complete.")
 
-    # --- Interactive Layout Viewer ---
-    st.header("🏡 Select Layout to View")
+    # --- Show all layouts together ---
+    st.header("🏡 All Top 3 Layouts Found")
 
-    layout_choice = st.selectbox(
-        "Choose Layout:",
-        options=[f"Layout #{i+1} (Score: {score})" for i, (score, _) in enumerate(final_layouts)],
-        index=0
-    )
-
-    selected_index = int(layout_choice.split("#")[1].split()[0]) - 1
-    selected_score, selected_layout = final_layouts[selected_index]
-
-    st.subheader(f"🏆 Viewing {layout_choice}")
-    render_colored_grid(selected_layout, f"📌 Layout #{selected_index + 1} with H1–H4")
-
-    analyze_single_profit(selected_layout)
+    for i, (score, layout) in enumerate(final_layouts, 1):
+        st.subheader(f"🏆 Layout #{i} — Score: {score}")
+        render_colored_grid(layout, f"📌 Layout #{i} with H1–H4")
+        analyze_single_profit(layout)
+        st.markdown("---")  # เส้นคั่นแต่ละ Layout
 
 else:
     st.info("👈 Please configure settings and press 'Train AI' to start.")
