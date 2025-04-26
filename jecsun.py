@@ -325,7 +325,7 @@ def analyze_profits(top_layouts):
         print("\n" + "-"*50)
 
 
-# Execute AI
+# Load or initialize Q-table
 q_table = load_q_table(Q_TABLE_FILE)
 
 # Generate or load grid
@@ -336,11 +336,16 @@ print(f"\n✅ Grid size: {len(grid)} rows x {len(grid[0]) if grid else 0} cols |
 
 # Train and get top 3 layouts
 top_layouts, action_log = train_ai(EPISODES, grid)
+best_score, best_grid = top_layouts[0]
 
 # Show all top 3 layouts
 final_layouts = []
 for i, (score, layout) in enumerate(top_layouts, 1):
-    print(f"\n🏆 Layout #{i} — Raw Score: {score}")
+    if i == 1:
+        print(f"\n🏆 Best Layout #{i} — Raw Score: {score}")
+    else:
+        print(f"\n⭐ Layout #{i} — Raw Score: {score}")
+
     for row in layout:
         print(" ".join(row))
 
@@ -356,6 +361,10 @@ for i, (score, layout) in enumerate(top_layouts, 1):
 # Save Q-table
 save_q_table(Q_TABLE_FILE)
 
+# Save best final layout separately for future use
+best_final_layout = final_layouts[0][1]  # (score, layout) -> take layout only
+
 # Analyze all 3 layouts together
 analyze_profits(final_layouts)
+
 
