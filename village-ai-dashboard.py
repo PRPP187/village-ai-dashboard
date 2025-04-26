@@ -81,20 +81,19 @@ if train_ai_clicked:
     with st.spinner("🧠 Training AI... Please wait..."):
         top_layouts, action_log = train_ai(EPISODES, grid)
 
-    final_layouts = []
-    for score, layout in top_layouts:
-        final_layout = apply_house_types([row[:] for row in layout])
-        final_layouts.append((score, final_layout))
-
     st.success("✅ AI Training Complete.")
 
     # --- Show all layouts together ---
     st.header("🏡 All Top 3 Layouts Found")
 
-    for i, (score, layout) in enumerate(final_layouts, 1):
-        st.subheader(f"🏆 Layout #{i} — Score: {score}")
-        render_colored_grid(layout, f"📌 Layout #{i} with H1–H4")
-        analyze_single_profit(layout)
+    for i, (score, layout) in enumerate(top_layouts, 1):
+        st.subheader(f"🏆 Layout #{i} — Raw Score: {score}")
+        render_colored_grid(layout, f"📌 Layout #{i} (Before House Types)")
+
+        final_layout = apply_house_types([row[:] for row in layout])
+        render_colored_grid(final_layout, f"📌 Layout #{i} with H1–H4")
+        analyze_single_profit(final_layout)
+
         st.markdown("---")  # เส้นคั่นแต่ละ Layout
 
 else:
