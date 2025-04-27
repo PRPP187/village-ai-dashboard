@@ -22,6 +22,13 @@ with st.sidebar:
 
 # --- Main Title and Notice ---
 st.markdown("""
+    <div style='text-align: center; margin-bottom: 30px;'>
+        <h1 style='color:#F8F8F8;'>🏘️ AI Village Layout Optimization with Q-Learning</h1>
+        <p style='color:#BBBBBB; font-size:18px;'>
+            Optimize village layouts intelligently using Q-Learning.<br>
+            Design smarter. Build better. Profit more.
+        </p>
+    </div>
     <div style='background-color: #FFF3CD; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
         ⚡ <strong>Note:</strong><br>
         This is a basic demonstration version of the AI. It does <strong>not</strong> save newly generated layouts for future learning.<br><br>
