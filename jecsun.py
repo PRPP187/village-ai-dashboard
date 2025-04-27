@@ -75,7 +75,7 @@ def calculate_reward_verbose(grid):
 
     r_clusters = count_r_clusters(grid) if np.any(grid == 'R') else 0
     if r_clusters > 1:
-        penalty -= 500 * (r_clusters - 1)
+        penalty -= 1000 * (r_clusters - 1)
 
     if len(h_positions) > 0:
         h_neighbors_r = np.any([
