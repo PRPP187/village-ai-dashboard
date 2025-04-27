@@ -23,21 +23,21 @@ with st.sidebar:
 # --- Main Title and Notice ---
 st.markdown("""
     <div style='background-color: #FFF3CD; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
-        ⚡ <strong>Note:</strong><br>
+        ⚡ <strong>Note:</strong><br><br>
+
         This is a basic demonstration version of the AI. It does <strong>not</strong> save newly generated layouts for future learning.<br><br>
 
-        For the best experience, we recommend using a <strong>3×3 grid size</strong>.<br>
-        Using larger grids (4×4 or 5×5) may result in:<br>
-        - <strong>Longer training times</strong><br>
-        - <strong>Occasional layout inaccuracies</strong><br>
-        because the AI retrains from scratch every time, and the current number of episodes may not be sufficient to consistently find optimal layouts.<br><br>
+        For the best experience, we recommend using a <strong>3×3 grid size</strong>.<br><br>
 
-        📐 Additionally, <strong>horizontal layouts</strong> (e.g., 3×4, 3×5) tend to perform better than vertical layouts (e.g., 4×3, 5×3).<br>
-        This is because the AI has been trained under the assumption that <strong>houses should face north and south</strong>,<br>
-        where the top side of the grid always represents <strong>north</strong>.
+        <strong>Important considerations:</strong><br>
+        <ul>
+            <li>Using larger grids (4×4 or 5×5) may result in longer training times and occasional layout inaccuracies.</li>
+            <li>The AI retrains from scratch every time, and the current number of episodes may not always be sufficient to find the best layout.</li>
+            <li>Horizontal layouts (e.g., 3×4, 3×5) tend to perform better than vertical layouts (e.g., 4×3, 5×3).</li>
+            <li>The AI assumes that houses should face <strong>north and south</strong>, with the top side of the grid always representing <strong>north</strong>.</li>
+        </ul>
     </div>
 """, unsafe_allow_html=True)
-
 
 # --- Grid Rendering ---
 def render_colored_grid(grid, title):
