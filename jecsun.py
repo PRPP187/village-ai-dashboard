@@ -296,17 +296,27 @@ def analyze_profit(grid):
     total_profit = total_sale - total_cost
     avg_profit_per_sqm = total_profit / total_size if total_size else 0
 
+    print("\n📋 House Type Summary:\n")
+    print("House Type | Number of Units | Cost/Unit | Sale/Unit | Profit/Unit | Total Cost | Total Profit")
+    print("-" * 95)
+
     total_units = sum(summary.values())
     for htype, count in summary.items():
         if count:
             info = HOUSE_PRICES[htype]
-            print(f"🏠 {htype}: {count} units | {info['cost']:,} Baht cost | {info['sale']:,} Baht sale")
+            cost_per_unit = info['cost']
+            sale_per_unit = info['sale']
+            profit_per_unit = sale_per_unit - cost_per_unit
+            total_cost_type = cost_per_unit * count
+            total_profit_type = profit_per_unit * count
 
-    print(f"\n💸 Total Construction Cost: {total_cost:,} Baht")
-    print(f"💰 Total Revenue: {total_sale:,} Baht")
-    print(f"📈 Total Profit: {total_profit:,} Baht")
-    print(f"📐 Average Profit per sqm: {avg_profit_per_sqm:,.2f} Baht/sqm")
-    print(f"🎯 Weighted Profit: {weighted_profit:,.2f} Baht")
+            print(f"🏠 {htype} | {count} units | {cost_per_unit:,.0f} Baht | {sale_per_unit:,.0f} Baht | {profit_per_unit:,.0f} Baht | {total_cost_type:,.0f} Baht | {total_profit_type:,.0f} Baht")
+
+    print("\n💸 Total Construction Cost:", f"{total_cost:,} Baht")
+    print("💰 Total Revenue:", f"{total_sale:,} Baht")
+    print("📈 Total Profit:", f"{total_profit:,} Baht")
+    print("📐 Average Profit per sqm:", f"{avg_profit_per_sqm:,.2f} Baht/sqm")
+    print("🎯 Weighted Profit (Market Preference):", f"{weighted_profit:,.2f} Baht")
 
 # Start execution
 q_table = {}
