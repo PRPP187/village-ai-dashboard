@@ -8,7 +8,21 @@ from jecsun import initialize_grid, load_or_initialize_grid, train_ai, apply_hou
 
 # --- Page Config ---
 st.set_page_config(page_title="AI Village Planner", layout="wide")
-st.title("🏘️ AI Village Layout Optimization with Q-Learning")
+
+# --- Top Logo and Title ---
+st.markdown(
+    """
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="https://raw.githubusercontent.com/your-github-repo-path/Jecsu%20logo.png" width="200">
+        <h1 style="color: #F8F8F8;">🏘️ AI Village Layout Optimization with Q-Learning</h1>
+        <p style="color: #BBBBBB; font-size:18px;">
+            Optimize village layouts intelligently using Q-Learning.<br>
+            Design smarter. Build better. Profit more.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # --- Sidebar ---
 st.sidebar.header("🔧 Configuration Settings")
@@ -30,7 +44,7 @@ def render_colored_grid(grid, title):
         'H2': '#F08080',
         'H3': '#FA8072',
         'H4': '#E9967A',
-        '0': '#F0F0F0',  # White Gray
+        '0': '#F0F0F0',
     }
 
     html = "<table style='border-collapse: collapse;'>"
