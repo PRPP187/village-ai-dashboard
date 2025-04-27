@@ -22,19 +22,16 @@ with st.sidebar:
 
 # --- Main Title and Notice ---
 st.markdown("""
-<div style='background-color: #FFF3CD; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size:16px;'>
-    ⚡ <b>Note:</b><br><br>
-    This is a basic demonstration version of the AI. It does <b>NOT</b> save newly generated layouts for future learning.<br><br>
-
-    <b>Best Practice:</b><br>
-    - Recommended grid size: <b>3×3</b><br><br>
-
-    <b>Important considerations:</b><br>
-    - Using larger grids (4×4, 5×5) may result in longer training times and occasional layout inaccuracies.<br>
-    - The AI retrains from scratch every time, and the current number of episodes may not always be enough to find the best layout.<br>
-    - <b>Horizontal layouts</b> (e.g., 3×4, 3×5) tend to perform better than vertical layouts (e.g., 4×3, 5×3).<br>
-    - The AI assumes that houses should face <b>North</b> and <b>South</b>, with the top side of the grid always representing <b>North</b>.<br>
-</div>
+    <div style='background-color: #FFF3CD; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
+        ⚡ <strong>Note:</strong><br>
+        This is a basic demonstration version of the AI. It does <strong>not</strong> save newly generated layouts for future learning.<br><br>
+        
+        For the best experience, we recommend using a <strong>3×3 grid size</strong>.<br>
+        Using larger grids (4×4 or 5×5) may result in:<br>
+        - <strong>Longer training times</strong><br>
+        - <strong>Occasional layout inaccuracies</strong><br>
+        because the AI retrains from scratch every time, and the current number of episodes may not be sufficient to consistently find optimal layouts.
+    </div>
 """, unsafe_allow_html=True)
 
 # --- Grid Rendering ---
