@@ -19,10 +19,10 @@ E_START_POSITION = (1, 1)
 
 # House Price Settings
 HOUSE_PRICES = {
-    'H1': {'cost': 2_000_000, 'sale': 2_800_000, 'size': 120, 'weight': 1.0},
-    'H2': {'cost': 1_800_000, 'sale': 2_500_000, 'size': 100, 'weight': 1.0},
-    'H3': {'cost': 2_200_000, 'sale': 2_900_000, 'size': 140, 'weight': 1.1},
-    'H4': {'cost': 2_500_000, 'sale': 3_200_000, 'size': 160, 'weight': 0.9},
+    'H1': {'cost': 1_800_000, 'sale': 3_300_000, 'size': 110, 'weight': 1.3},
+    'H2': {'cost': 1_900_000, 'sale': 3_700_000, 'size': 125, 'weight': 1.1},
+    'H3': {'cost': 2_300_000, 'sale': 4_300_000, 'size': 160, 'weight': 1.0},
+    'H4': {'cost': 3_000_000, 'sale': 5_200_000, 'size': 200, 'weight': 0.9},
 }
 
 # CSV Loading
