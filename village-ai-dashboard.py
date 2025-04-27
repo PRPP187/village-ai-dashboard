@@ -20,14 +20,16 @@ with st.sidebar:
     e_position = (e_row, e_col)
     train_ai_clicked = st.button("🚀 Train AI")
 
-# --- Main Title ---
+# --- Main Title and Notice ---
 st.markdown("""
-    <div style='text-align: center; margin-bottom: 30px;'>
-        <h1 style='color:#F8F8F8;'>🏘️ AI Village Layout Optimization with Q-Learning</h1>
-        <p style='color:#BBBBBB; font-size:18px;'>
-            Optimize village layouts intelligently using Q-Learning.<br>
-            Design smarter. Build better. Profit more.
-        </p>
+    <div style='background-color: #FFF3CD; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
+        ⚡ <strong>Note:</strong><br>
+        This is a basic demonstration version of the AI. It does <strong>not</strong> save newly generated layouts for future learning.<br><br>
+        For the best experience, we recommend using a <strong>3×3 grid size</strong>.<br>
+        Using larger grids (4×4 or 5×5) may result in:<br>
+        - <strong>Longer training times</strong><br>
+        - <strong>Occasional layout inaccuracies</strong><br>
+        because the AI retrains from scratch every time, and the current number of episodes may not be sufficient to consistently find optimal layouts.
     </div>
 """, unsafe_allow_html=True)
 
