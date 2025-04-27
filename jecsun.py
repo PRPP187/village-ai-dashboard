@@ -9,14 +9,14 @@ from collections import deque
 import time
 
 # ตั้งค่าขนาด Grid
-GRID_ROWS = 4
-GRID_COLS = 4
-EPISODES = 1000
+GRID_ROWS = 3
+GRID_COLS = 3
+EPISODES = 10000
 ALPHA = 0.1
 GAMMA = 0.9
 SCORES = {'E': 10, 'G': 10, 'H': 15, 'R': 5, '0': 0}
 Q_TABLE_FILE = "q_table.json"
-E_START_POSITION = (2, 1)
+E_START_POSITION = (1, 1)
 
 # กำหนดราคาบ้านแต่ละแบบ (ต้นทุน, ราคาขาย, ขนาดตร.ม., market weight)
 HOUSE_PRICES = {
@@ -403,11 +403,11 @@ def analyze_profit(grid):
             ratio_percent = (count / total_units) * 100
             print(f"🏠 {htype}: {count} หลัง | {ratio_percent:.1f}% | ต้นทุนต่อหลัง: {info['cost']:,} บาท | รายได้ต่อหลัง: {info['sale']:,} บาท | รายได้รวม: {info['sale'] * count:,} บาท")
 
-    print(f"\n💸 ต้นทุนรวมทั้งหมด: {total_cost:,} บาท")
-    print(f"💰 รายได้รวมทั้งหมด: {total_sale:,} บาท")
-    print(f"📈 กำไรรวมทั้งหมด: {total_profit:,} บาท")
-    print(f"📐 กำไรเฉลี่ยต่อ ตร.ม.: {avg_profit_per_sqm:,.2f} บาท/ตร.ม.")
-    print(f"🎯 กำไรปรับตาม market weight: {weighted_profit:,.2f} บาท")
+    print(f"\n💸 Total Construction Cost: {total_cost:,} Baht")
+    print(f"💰 Total Revenue: {total_sale:,} Baht")
+    print(f"📈 Total Profit: {total_profit:,} Baht")
+    print(f"📐 Average Profit per sqm: {avg_profit_per_sqm:,.2f} Baht/sqm")
+    print(f"🎯 Weighted Profit (Market Preference): {weighted_profit:,.2f} Baht")
 
 # ✅ ฝึก AI และบันทึกผลลัพธ์
 q_table = {}
