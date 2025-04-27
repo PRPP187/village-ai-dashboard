@@ -25,7 +25,7 @@ st.markdown("""
     <div style='background-color: #FFF3CD; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
         ⚡ <strong>Note:</strong><br>
         This is a basic demonstration version of the AI. It does <strong>not</strong> save newly generated layouts for future learning.<br><br>
-        For the best experience, we recommend using a <strong>3×3 grid size</strong>.<br>
+        For the best experience, we recommend using a <strong>3×3 grid size</strong>.<br><br>
         Using larger grids (4×4 or 5×5) may result in:<br>
         - <strong>Longer training times</strong><br>
         - <strong>Occasional layout inaccuracies</strong><br>
