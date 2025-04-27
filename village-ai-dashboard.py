@@ -51,15 +51,15 @@ st.markdown("""
 def render_colored_grid(grid, title):
     st.subheader(title)
     color_map = {
-        'E': '#FFD700',  # Gold
+        'E': '#f8a11d',  # Gold
         'R': '#A9A9A9',  # Gray
-        'G': '#98FB98',  # Light Green
-        'H': '#FFB6C1',  # Light Pink
-        'H1': '#FFA07A',
-        'H2': '#F08080',
-        'H3': '#FA8072',
-        'H4': '#E9967A',
-        '0': '#F0F0F0',
+        'G': '#217424',  # Green
+        'H': '#dd563f',  # Light Pink
+        'H1': '#c21c00',
+        'H2': '#9d1801',
+        'H3': '#801300',
+        'H4': '#640f00',
+        '0': '#c4c4c4',
     }
     html = "<table style='border-collapse: collapse;'>"
     for row in grid:
