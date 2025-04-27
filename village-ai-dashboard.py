@@ -90,14 +90,21 @@ if train_ai_clicked:
 
     render_colored_grid(final_grid, "📌 Final Layout with House Types (H1–H4)")
 
-    st.subheader("📊 Profitability Analysis")
-    buffer = io.StringIO()
-    sys.stdout = buffer
-    analyze_profit(final_grid)
-    sys.stdout = sys.__stdout__
-    st.text(buffer.getvalue())
+    # --- Profitability Analysis ---
+    st.subheader("📋 House Profit Summary")
+    
+    profit_df, extra_info = analyze_profit(final_grid)
+    st.table(profit_df)
+    
+    st.markdown(f"""
+    💸 **Total Construction Cost:** {extra_info['total_cost']:,} Baht  
+    💰 **Total Revenue:** {extra_info['total_sale']:,} Baht  
+    📈 **Total Profit:** {extra_info['total_profit']:,} Baht  
+    📐 **Average Profit per sqm:** {extra_info['avg_profit_per_sqm']:,.2f} Baht/sqm  
+    🎯 **Weighted Profit (Market Preference):** {extra_info['weighted_profit']:,.2f} Baht
+    """)
 
-    st.balloons()
+    st.toast('🎉 Training complete! Best layout found.')
 
 else:
     st.info("👈 Please configure settings and click 'Train AI' to start.")
