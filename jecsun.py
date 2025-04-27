@@ -342,6 +342,7 @@ def analyze_profit(grid):
 
     return profit_df, extra_info
 
+
 # Start execution
 q_table = {}
 
