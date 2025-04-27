@@ -91,7 +91,7 @@ def calculate_reward_verbose(grid):
     green_ratio = num_green / total_cells
     if green_ratio < 0.05:
         penalty -= 500
-    if green_ratio > 0.1:
+    if green_ratio > 0.15:
         penalty -= 500
         
     if np.sum(grid == 'R') == 0:
