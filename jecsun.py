@@ -314,10 +314,9 @@ def analyze_profit(grid):
                 "Total Profit (Baht)": total_profit_type
             })
 
-    # ✅ สร้าง DataFrame
     df = pd.DataFrame(rows)
 
-    # ✅ เพิ่มบรรทัด Total
+    # สร้างแถว TOTAL
     total_row = {
         "House Type": "TOTAL",
         "Units": df["Units"].sum(),
@@ -329,23 +328,16 @@ def analyze_profit(grid):
     }
     df = pd.concat([df, pd.DataFrame([total_row])], ignore_index=True)
 
-    # ✅ แสดงตารางใน Streamlit
-    st.subheader("📋 House Profit Summary")
-    st.table(df)
+    # ข้อมูลเพิ่มเติม
+    extra_info = {
+        "total_cost": total_cost,
+        "total_sale": total_sale,
+        "total_profit": total_sale - total_cost,
+        "avg_profit_per_sqm": total_profit / total_size if total_size else 0,
+        "weighted_profit": weighted_profit
+    }
 
-    # ✅ ข้อมูลเพิ่มเติม
-    total_profit = total_sale - total_cost
-    avg_profit_per_sqm = total_profit / total_size if total_size else 0
-
-    st.markdown(f"""
-    💸 **Total Construction Cost:** {total_cost:,} Baht  
-    💰 **Total Revenue:** {total_sale:,} Baht  
-    📈 **Total Profit:** {total_profit:,} Baht  
-    📐 **Average Profit per sqm:** {avg_profit_per_sqm:,.2f} Baht/sqm  
-    🎯 **Weighted Profit (Market Preference):** {weighted_profit:,.2f} Baht
-    """)
-
-
+    return df, extra_info
 
 # Start execution
 q_table = {}
