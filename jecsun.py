@@ -301,6 +301,7 @@ def analyze_profit(grid):
     print("House Type | Number of Units | Cost/Unit | Sale/Unit | Profit/Unit | Total Cost | Total Profit")
     print("-" * 95)
 
+    rows = []
     total_units = sum(summary.values())
     for htype, count in summary.items():
         if count:
@@ -311,6 +312,16 @@ def analyze_profit(grid):
             total_cost_type = cost_per_unit * count
             total_profit_type = profit_per_unit * count
 
+            rows.append({
+                "House Type": htype,
+                "Units": count,
+                "Cost/Unit": cost_per_unit,
+                "Sale/Unit": sale_per_unit,
+                "Profit/Unit": profit_per_unit,
+                "Total Cost": total_cost_type,
+                "Total Profit": total_profit_type
+            })
+
             print(f"🏠 {htype} | {count} units | {cost_per_unit:,.0f} Baht | {sale_per_unit:,.0f} Baht | {profit_per_unit:,.0f} Baht | {total_cost_type:,.0f} Baht | {total_profit_type:,.0f} Baht")
 
     print("\n💸 Total Construction Cost:", f"{total_cost:,} Baht")
@@ -319,6 +330,17 @@ def analyze_profit(grid):
     print("📐 Average Profit per sqm:", f"{avg_profit_per_sqm:,.2f} Baht/sqm")
     print("🎯 Weighted Profit (Market Preference):", f"{weighted_profit:,.2f} Baht")
 
+    # --- Prepare return values ---
+    profit_df = pd.DataFrame(rows)
+    extra_info = {
+        "Total Construction Cost": total_cost,
+        "Total Revenue": total_sale,
+        "Total Profit": total_profit,
+        "Average Profit per sqm": avg_profit_per_sqm,
+        "Weighted Profit": weighted_profit
+    }
+
+    return profit_df, extra_info
 
 # Start execution
 q_table = {}
