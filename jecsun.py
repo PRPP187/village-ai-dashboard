@@ -6,6 +6,9 @@ import glob
 import pandas as pd
 from collections import deque
 import time
+import streamlit as st
+import pandas as pd
+from jecsun import HOUSE_PRICES
 
 # Grid Settings
 GRID_ROWS = 3
@@ -280,9 +283,11 @@ def measure_execution_time(function, *args, **kwargs):
     return *result, elapsed_time
 
 def analyze_profit(grid):
-    summary = {k: 0 for k in HOUSE_PRICES}
-    rows = []
+    if not grid or not isinstance(grid, list):
+        st.warning("Invalid or empty grid provided.")
+        return
 
+    summary = {k: 0 for k in HOUSE_PRICES}
     total_cost = total_sale = total_size = weighted_profit = 0
 
     for row in grid:
@@ -295,49 +300,42 @@ def analyze_profit(grid):
                 total_size += info['size']
                 weighted_profit += (info['sale'] - info['cost']) * info['weight']
 
+    data = []
     for htype, count in summary.items():
         if count:
             info = HOUSE_PRICES[htype]
-            cost_per_unit = info['cost']
-            sale_per_unit = info['sale']
-            profit_per_unit = sale_per_unit - cost_per_unit
-            total_cost_type = cost_per_unit * count
-            total_profit_type = profit_per_unit * count
-
-            rows.append({
+            profit_per_unit = info['sale'] - info['cost']
+            row = {
                 "House Type": htype,
                 "Units": count,
-                "Cost/Unit (Baht)": cost_per_unit,
-                "Sale/Unit (Baht)": sale_per_unit,
-                "Profit/Unit (Baht)": profit_per_unit,
-                "Total Cost (Baht)": total_cost_type,
-                "Total Profit (Baht)": total_profit_type
-            })
+                "Cost/Unit": info['cost'],
+                "Sale/Unit": info['sale'],
+                "Profit/Unit": profit_per_unit,
+                "Total Cost": info['cost'] * count,
+                "Total Profit": profit_per_unit * count,
+            }
+            data.append(row)
 
-    df = pd.DataFrame(rows)
+    df = pd.DataFrame(data)
 
-    # สร้างแถว TOTAL
-    total_row = {
-        "House Type": "TOTAL",
-        "Units": df["Units"].sum(),
-        "Cost/Unit (Baht)": "-",
-        "Sale/Unit (Baht)": "-",
-        "Profit/Unit (Baht)": "-",
-        "Total Cost (Baht)": df["Total Cost (Baht)"].sum(),
-        "Total Profit (Baht)": df["Total Profit (Baht)"].sum()
-    }
-    df = pd.concat([df, pd.DataFrame([total_row])], ignore_index=True)
+    st.subheader("📋 House Profit Summary")
+    st.dataframe(df.style.format({
+        "Cost/Unit": "{:,}",
+        "Sale/Unit": "{:,}",
+        "Profit/Unit": "{:,}",
+        "Total Cost": "{:,}",
+        "Total Profit": "{:,}",
+    }))
 
-    # ข้อมูลเพิ่มเติม
-    extra_info = {
-        "total_cost": total_cost,
-        "total_sale": total_sale,
-        "total_profit": total_sale - total_cost,
-        "avg_profit_per_sqm": total_profit / total_size if total_size else 0,
-        "weighted_profit": weighted_profit
-    }
+    total_profit = total_sale - total_cost
+    avg_profit_per_sqm = total_profit / total_size if total_size else 0
 
-    return df, extra_info
+    st.subheader("📈 Overall Project Summary")
+    st.markdown(f"💸 **Total Construction Cost:** {total_cost:,} Baht")
+    st.markdown(f"💰 **Total Revenue:** {total_sale:,} Baht")
+    st.markdown(f"📈 **Total Profit:** {total_profit:,} Baht")
+    st.markdown(f"📐 **Average Profit per sqm:** {avg_profit_per_sqm:,.2f} Baht/sqm")
+    st.markdown(f"🎯 **Weighted Profit (Market Preference):** {weighted_profit:,.2f} Baht")
 
 # Start execution
 q_table = {}
