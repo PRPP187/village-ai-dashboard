@@ -9,28 +9,27 @@ from jecsun import initialize_grid, load_or_initialize_grid, train_ai, apply_hou
 # --- Page Config ---
 st.set_page_config(page_title="AI Village Planner", layout="wide")
 
-# --- Top Logo and Title ---
-st.markdown(
-    """
-    <div style="text-align: center; margin-bottom: 20px;">
-        <img src="https://raw.githubusercontent.com/your-github-repo-path/Jecsu%20logo.png" width="200">
-        <h1 style="color: #F8F8F8;">🏘️ AI Village Layout Optimization with Q-Learning</h1>
-        <p style="color: #BBBBBB; font-size:18px;">
+# --- Sidebar ---
+with st.sidebar:
+    st.image("Jecsu logo.png", width=150)  # <<-- เพิ่มโลโก้ตรงนี้
+    st.header("🔧 Configuration Settings")
+    rows = st.slider("Number of Rows", 3, 6, GRID_ROWS)
+    cols = st.slider("Number of Columns", 3, 6, GRID_COLS)
+    e_row = st.number_input("E Position (Row, 1-based)", 1, rows, E_START_POSITION[0])
+    e_col = st.number_input("E Position (Column, 1-based)", 1, cols, E_START_POSITION[1])
+    e_position = (e_row, e_col)
+    train_ai_clicked = st.button("🚀 Train AI")
+
+# --- Main Title ---
+st.markdown("""
+    <div style='text-align: center; margin-bottom: 30px;'>
+        <h1 style='color:#F8F8F8;'>🏘️ AI Village Layout Optimization with Q-Learning</h1>
+        <p style='color:#BBBBBB; font-size:18px;'>
             Optimize village layouts intelligently using Q-Learning.<br>
             Design smarter. Build better. Profit more.
         </p>
     </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# --- Sidebar ---
-st.sidebar.header("🔧 Configuration Settings")
-rows = st.sidebar.slider("Number of Rows", 3, 6, GRID_ROWS)
-cols = st.sidebar.slider("Number of Columns", 3, 6, GRID_COLS)
-e_row = st.sidebar.number_input("E Position (Row, 1-based)", 1, rows, E_START_POSITION[0])
-e_col = st.sidebar.number_input("E Position (Column, 1-based)", 1, cols, E_START_POSITION[1])
-e_position = (e_row, e_col)
+""", unsafe_allow_html=True)
 
 # --- Grid Rendering ---
 def render_colored_grid(grid, title):
@@ -46,7 +45,6 @@ def render_colored_grid(grid, title):
         'H4': '#E9967A',
         '0': '#F0F0F0',
     }
-
     html = "<table style='border-collapse: collapse;'>"
     for row in grid:
         html += "<tr>"
@@ -55,11 +53,10 @@ def render_colored_grid(grid, title):
             html += f"<td style='border: 1px solid black; background-color: {color}; width: 40px; height: 40px; text-align: center;'>{cell}</td>"
         html += "</tr>"
     html += "</table>"
-
     st.markdown(html, unsafe_allow_html=True)
 
-# --- Main Workflow ---
-if st.sidebar.button("🚀 Train AI"):
+# --- Main Logic ---
+if train_ai_clicked:
     with st.spinner("Loading or creating grid..."):
         grid, new_e = initialize_grid(rows, cols, e_position)
         grid, _ = load_or_initialize_grid(csv_folder, rows, cols, new_e)
