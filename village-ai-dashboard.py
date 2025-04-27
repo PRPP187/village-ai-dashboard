@@ -13,8 +13,8 @@ st.set_page_config(page_title="AI Village Planner", layout="wide")
 with st.sidebar:
     st.image("Jecsu logo.png", width=150)  # <<-- เพิ่มโลโก้ตรงนี้
     st.header("🔧 Configuration Settings")
-    rows = st.slider("Number of Rows", 3, 5, GRID_ROWS)
-    cols = st.slider("Number of Columns", 3, 5, GRID_COLS)
+    rows = st.slider("Number of Rows", 3, 8, GRID_ROWS)
+    cols = st.slider("Number of Columns", 3, 8, GRID_COLS)
     e_row = st.number_input("E Position (Row, 1-based)", 1, rows, E_START_POSITION[0])
     e_col = st.number_input("E Position (Column, 1-based)", 1, cols, E_START_POSITION[1])
     e_position = (e_row, e_col)
