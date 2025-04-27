@@ -283,6 +283,8 @@ def analyze_profit(grid):
     summary = {k: 0 for k in HOUSE_PRICES}
     total_cost = total_sale = total_size = weighted_profit = 0
 
+    rows = []
+
     for row in grid:
         for cell in row:
             if cell in HOUSE_PRICES:
@@ -296,17 +298,32 @@ def analyze_profit(grid):
     total_profit = total_sale - total_cost
     avg_profit_per_sqm = total_profit / total_size if total_size else 0
 
-    total_units = sum(summary.values())
     for htype, count in summary.items():
         if count:
             info = HOUSE_PRICES[htype]
-            print(f"🏠 {htype}: {count} units | {info['cost']:,} Baht cost | {info['sale']:,} Baht sale")
+            rows.append({
+                "House Type": htype,
+                "Units": count,
+                "Cost/Unit": info['cost'],
+                "Sale/Unit": info['sale'],
+                "Profit/Unit": info['sale'] - info['cost'],
+                "Total Cost": info['cost'] * count,
+                "Total Profit": (info['sale'] - info['cost']) * count
+            })
 
-    print(f"\n💸 Total Construction Cost: {total_cost:,} Baht")
-    print(f"💰 Total Revenue: {total_sale:,} Baht")
-    print(f"📈 Total Profit: {total_profit:,} Baht")
-    print(f"📐 Average Profit per sqm: {avg_profit_per_sqm:,.2f} Baht/sqm")
-    print(f"🎯 Weighted Profit: {weighted_profit:,.2f} Baht")
+    # 🏠 ทำ DataFrame สำหรับแสดงตาราง
+    profit_df = pd.DataFrame(rows)
+
+    # 🧠 ทำ Dictionary สำหรับสรุปผล
+    extra_info = {
+        "Total Construction Cost": total_cost,
+        "Total Revenue": total_sale,
+        "Total Profit": total_profit,
+        "Average Profit per sqm": avg_profit_per_sqm,
+        "Weighted Profit (Market Preference)": weighted_profit
+    }
+
+    return profit_df, extra_info
 
 # Start execution
 q_table = {}
