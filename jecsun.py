@@ -298,7 +298,7 @@ def analyze_profit(grid):
 
     print("\n📋 House Type Summary:\n")
     print("House Type | Number of Units | Cost/Unit | Sale/Unit | Profit/Unit | Total Cost | Total Profit")
-    print("-" * 95)
+    print("-" * 120)
 
     total_units = sum(summary.values())
     for htype, count in summary.items():
