@@ -97,7 +97,7 @@ if train_ai_clicked:
     sys.stdout = sys.__stdout__
     st.text(buffer.getvalue())
 
-    st.toast('🎉 Training complete! Best layout found.')
-    
+    st.snow()
+
 else:
     st.info("👈 Please configure settings and click 'Train AI' to start.")
