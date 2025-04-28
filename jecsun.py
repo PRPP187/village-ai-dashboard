@@ -239,14 +239,13 @@ def load_or_initialize_grid(csv_folder, rows, cols, e_position):
         return best_grid, e_position
     return initialize_grid(rows, cols, e_position)
 
-def choose_action(grid, e_position=(1, 1), epsilon=0.1):
-    """Choose the best action based on BFS exploration starting from E position."""
+def choose_action(grid, e_position=(1,1), epsilon=0.1):
     if not isinstance(grid, np.ndarray):
         grid = np.array(grid)
 
     rows, cols = grid.shape
     visited = set()
-    queue = deque([(e_position[0]-1, e_position[1]-1)])  # Convert to 0-based index
+    queue = deque([(e_position[0]-1, e_position[1]-1)])
     build_order = []
 
     while queue:
@@ -266,28 +265,10 @@ def choose_action(grid, e_position=(1, 1), epsilon=0.1):
     if not build_order:
         return None
 
-    # Random exploration (epsilon greedy)
-    if random.random() < epsilon:
-        r, c = random.choice(build_order)
-        char = random.choice(['H', 'R', 'G'])
-        return r, c, char
-
-    # Exploitation (choose best placement)
-    best_score = float('-inf')
-    best_choice = None
-    best_position = None
-
-    for r, c in build_order:
-        for char in ['H', 'R', 'G']:
-            temp_grid = grid.copy()
-            temp_grid[r, c] = char
-            score = calculate_reward_verbose(temp_grid)
-            if score > best_score:
-                best_score = score
-                best_choice = char
-                best_position = (r, c)
-
-    return best_position[0], best_position[1], best_choice if best_choice else random.choice(['H', 'R', 'G'])
+    # Simplify: สุ่มเลือก cell แล้วสุ่ม H, R, G
+    r, c = random.choice(build_order)
+    char = random.choices(['H', 'R', 'G'], weights=[0.5, 0.4, 0.1])[0]
+    return r, c, char
 
 
 def update_q_table(state, action, reward, next_state):
