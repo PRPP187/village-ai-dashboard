@@ -84,7 +84,7 @@ def calculate_reward_verbose(grid):
     num_houses = np.sum(grid == 'H')
     num_roads = np.sum(grid == 'R')
     if num_houses < num_roads:
-        penalty -= 500
+        penalty -= 1000
     
     # Penalty: H not connected to R
     for r, c in h_positions:
