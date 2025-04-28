@@ -93,7 +93,7 @@ def calculate_reward_verbose(grid):
             for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]
         )
         if not has_road_neighbor:
-            penalty -= 300
+            penalty -= 500
 
     # Penalty: E not connected to R
     e_positions = np.argwhere(grid == 'E')
