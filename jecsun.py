@@ -42,6 +42,8 @@ H_TYPE_RATIOS = optimize_ratios()
 
 # Calculate reward score
 def calculate_reward_verbose(grid):
+    """ Calculate total score based on house-road-green pattern and connectivity rules (upgraded version). """
+
     if grid is None or len(grid) == 0 or len(grid[0]) == 0:
         print("⚠️ Error: Grid is None or empty! Using blank grid instead.")
         grid_size = 5
@@ -50,54 +52,71 @@ def calculate_reward_verbose(grid):
     grid = np.array(grid)
     rows, cols = grid.shape
 
+    # Base Scores (fixed)
     base_score = sum(SCORES.get(cell, 0) for row in grid for cell in row)
 
+    # Bonus
     bonus = 0
-    bonus += np.sum((grid[:, :-2] == 'H') & (grid[:, 1:-1] == 'H') & (grid[:, 2:] == 'H')) * 100
-    bonus += np.sum((grid[:, :-2] == 'R') & (grid[:, 1:-1] == 'R') & (grid[:, 2:] == 'R')) * 100
-    bonus += np.sum((grid[:-2, :] == 'H') & (grid[1:-1, :] == 'R') & (grid[2:, :] == 'H')) * 100
-    bonus += np.sum((grid[:-1, :-1] == 'H') & (grid[:-1, 1:] == 'H') &
-                    (grid[1:, :-1] == 'R') & (grid[1:, 1:] == 'R')) * 100
-    bonus += np.sum((grid[:-1, :-1] == 'R') & (grid[:-1, 1:] == 'R') &
-                    (grid[1:, :-1] == 'H') & (grid[1:, 1:] == 'H')) * 100
 
-    penalty = 0
+    # Bonus: H at edge
     h_positions = np.argwhere(grid == 'H')
+    edge_houses = np.sum((h_positions[:, 0] == 0) | (h_positions[:, 0] == rows - 1) |
+                         (h_positions[:, 1] == 0) | (h_positions[:, 1] == cols - 1))
+    bonus += edge_houses * 50
+
+    # Bonus: Pattern bonuses
+    bonus += np.sum((grid[:, :-2] == 'H') & (grid[:, 1:-1] == 'H') & (grid[:, 2:] == 'H')) * 100  # HHH
+    bonus += np.sum((grid[:, :-2] == 'R') & (grid[:, 1:-1] == 'R') & (grid[:, 2:] == 'R')) * 100  # RRR
+    bonus += np.sum((grid[:-2, :] == 'H') & (grid[1:-1, :] == 'R') & (grid[2:, :] == 'H')) * 100  # H-R-H
+    bonus += np.sum((grid[:-1, :] == 'R') & (grid[1:, :] == 'R') & (grid[:-1, :] == 'H') & (grid[1:, :] == 'H')) * 100  # RR-HH
+    bonus += np.sum((grid[:, :-1] == 'H') & (grid[:, 1:] == 'H') & (grid[:, :-1] == 'R') & (grid[:, 1:] == 'R')) * 100  # HR-HR
+
+    # Penalty
+    penalty = 0
+
+    # Penalty: H not connected to R
+    for r, c in h_positions:
+        has_road_neighbor = any(
+            0 <= r+dr < rows and 0 <= c+dc < cols and grid[r+dr, c+dc] == 'R'
+            for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]
+        )
+        if not has_road_neighbor:
+            penalty -= 300
+
+    # Penalty: E not connected to R
     e_positions = np.argwhere(grid == 'E')
+    for r, c in e_positions:
+        has_road_neighbor = any(
+            0 <= r+dr < rows and 0 <= c+dc < cols and grid[r+dr, c+dc] == 'R'
+            for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]
+        )
+        if not has_road_neighbor:
+            penalty -= 1000
 
-    if len(e_positions) > 0:
-        e_neighbors_r = np.any([
-            np.roll(grid == 'R', shift, axis=axis)[e_positions[:, 0], e_positions[:, 1]]
-            for shift, axis in [(1, 0), (-1, 0), (1, 1), (-1, 1)]
-        ], axis=0)
-        if not np.any(e_neighbors_r):
-            penalty -= 200
-
+    # Penalty: R not connected (count clusters)
     r_clusters = count_r_clusters(grid) if np.any(grid == 'R') else 0
     if r_clusters > 1:
-        penalty -= 1000 * (r_clusters - 1)
+        penalty -= 500 * r_clusters
+    elif r_clusters == 0:
+        penalty -= 1000
 
-    if len(h_positions) > 0:
-        h_neighbors_r = np.any([
-            np.roll(grid == 'R', shift, axis=axis)[h_positions[:, 0], h_positions[:, 1]]
-            for shift, axis in [(1, 0), (-1, 0), (1, 1), (-1, 1)]
-        ], axis=0)
-        penalty -= 200 * np.sum(~h_neighbors_r)
-        if np.all(h_neighbors_r):
-            bonus += 100
+    # Penalty: Wrong adjacent patterns
+    penalty -= np.sum((grid[:-1, :] == 'H') & (grid[1:, :] == 'H') & (grid[:-1, :] == 'R') & (grid[1:, :] == 'R')) * 50
+    penalty -= np.sum((grid[:, :-1] == 'R') & (grid[:, 1:] == 'R') & (grid[:, :-1] == 'H') & (grid[:, 1:] == 'H')) * 50
 
+    # Penalty: Green ratio too low or too high
     total_cells = rows * cols
-    num_green = np.sum(grid == 'G')
-    green_ratio = num_green / total_cells
+    green_cells = np.sum(grid == 'G')
+    green_ratio = green_cells / total_cells
     if green_ratio < 0.05:
         penalty -= 500
-    if green_ratio > 0.15:
-        penalty -= 500
-        
-    if np.sum(grid == 'R') == 0:
+    if green_ratio > 0.20:
         penalty -= 500
 
+    # Final score
     total_score = base_score + bonus + penalty
+
+    print(f"🎯 Debug: Total Grid Score = {total_score} (Base: {base_score}, Bonus: {bonus}, Penalty: {penalty})")
     return total_score
 
 def count_r_clusters(grid, use_dfs=False):
