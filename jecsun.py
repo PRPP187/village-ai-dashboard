@@ -64,16 +64,28 @@ def calculate_reward_verbose(grid):
                          (h_positions[:, 1] == 0) | (h_positions[:, 1] == cols - 1))
     bonus += edge_houses * 50
 
-    # Bonus: Pattern bonuses
-    bonus += np.sum((grid[:, :-2] == 'H') & (grid[:, 1:-1] == 'H') & (grid[:, 2:] == 'H')) * 100  # HHH
-    bonus += np.sum((grid[:, :-2] == 'R') & (grid[:, 1:-1] == 'R') & (grid[:, 2:] == 'R')) * 100  # RRR
-    bonus += np.sum((grid[:-2, :] == 'H') & (grid[1:-1, :] == 'R') & (grid[2:, :] == 'H')) * 100  # H-R-H
+    # Bonus: Pattern bonuses (Face to North)
+    bonus += np.sum((grid[:, :-2] == 'H') & (grid[:, 1:-1] == 'H') & (grid[:, 2:] == 'H')) * 100  # H-H-H แนวนอน
+    bonus += np.sum((grid[:, :-2] == 'R') & (grid[:, 1:-1] == 'R') & (grid[:, 2:] == 'R')) * 100  # R-R-R แนวนอน
+    bonus += np.sum((grid[:-2, :] == 'H') & (grid[1:-1, :] == 'R') & (grid[2:, :] == 'H')) * 100  # H-R-H แนวตั้ง
     bonus += np.sum((grid[:-1, :] == 'R') & (grid[1:, :] == 'R') & (grid[:-1, :] == 'H') & (grid[1:, :] == 'H')) * 100  # RR-HH
     bonus += np.sum((grid[:, :-1] == 'H') & (grid[:, 1:] == 'H') & (grid[:, :-1] == 'R') & (grid[:, 1:] == 'R')) * 100  # HR-HR
+    
+    # Bonus: Pattern bonuses (Face to South)
+    bonus += np.sum((grid[:, :-2] == 'H') & (grid[:, 1:-1] == 'R') & (grid[:, 2:] == 'H')) * 50   # H R H แนวนอน
+    bonus += np.sum((grid[:-2, :] == 'H') & (grid[1:-1, :] == 'H') & (grid[2:, :] == 'H')) * 50    # H-H-H แนวตั้ง
+    bonus += np.sum((grid[:-2, :] == 'R') & (grid[1:-1, :] == 'R') & (grid[2:, :] == 'R')) * 50    # R-R-R แนวตั้ง
+
 
     # Penalty
     penalty = 0
 
+    # ✅ Penalty ใหม่: ถ้า H น้อยกว่า R
+    num_houses = np.sum(grid == 'H')
+    num_roads = np.sum(grid == 'R')
+    if num_houses < num_roads:
+        penalty -= 500
+    
     # Penalty: H not connected to R
     for r, c in h_positions:
         has_road_neighbor = any(
