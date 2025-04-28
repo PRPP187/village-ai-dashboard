@@ -239,19 +239,56 @@ def load_or_initialize_grid(csv_folder, rows, cols, e_position):
         return best_grid, e_position
     return initialize_grid(rows, cols, e_position)
 
-def choose_action(grid):
-    if not grid or not isinstance(grid, list):
-        return None
-    rows = len(grid)
-    cols = max(len(row) for row in grid)
-    empty_cells = [(r, c) for r in range(rows) for c in range(cols) if grid[r][c] == '0']
+def choose_action(grid, e_position=(1, 1), epsilon=0.1):
+    """Choose the best action based on BFS exploration starting from E position."""
+    if not isinstance(grid, np.ndarray):
+        grid = np.array(grid)
 
-    if not empty_cells:
+    rows, cols = grid.shape
+    visited = set()
+    queue = deque([(e_position[0]-1, e_position[1]-1)])  # Convert to 0-based index
+    build_order = []
+
+    while queue:
+        r, c = queue.popleft()
+        if (r, c) in visited:
+            continue
+        visited.add((r, c))
+
+        if grid[r, c] == '0':
+            build_order.append((r, c))
+
+        for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in visited:
+                queue.append((nr, nc))
+
+    if not build_order:
         return None
 
-    r, c = random.choice(empty_cells)
-    char = random.choice(['H', 'R', 'G'])
-    return r, c, char
+    # Random exploration (epsilon greedy)
+    if random.random() < epsilon:
+        r, c = random.choice(build_order)
+        char = random.choice(['H', 'R', 'G'])
+        return r, c, char
+
+    # Exploitation (choose best placement)
+    best_score = float('-inf')
+    best_choice = None
+    best_position = None
+
+    for r, c in build_order:
+        for char in ['H', 'R', 'G']:
+            temp_grid = grid.copy()
+            temp_grid[r, c] = char
+            score = calculate_reward_verbose(temp_grid)
+            if score > best_score:
+                best_score = score
+                best_choice = char
+                best_position = (r, c)
+
+    return best_position[0], best_position[1], best_choice if best_choice else random.choice(['H', 'R', 'G'])
+
 
 def update_q_table(state, action, reward, next_state):
     state_str = json.dumps(state)
@@ -277,7 +314,7 @@ def train_ai(episodes, grid):
         max_steps = rows * cols
 
         for _ in range(max_steps):
-            action = choose_action(state)
+            action = choose_action(state, new_e_position)
             if action is None:
                 break
             r, c, char = action
