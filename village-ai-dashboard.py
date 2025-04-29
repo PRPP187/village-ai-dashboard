@@ -7,6 +7,8 @@ import sys
 from jecsun import initialize_grid, load_or_initialize_grid, train_ai, apply_house_types, analyze_profit, GRID_ROWS, GRID_COLS, E_START_POSITION, EPISODES, csv_folder
 import base64
 
+logo_url = get_base64_image("Jecsu logo.png")
+
 # --- Page Config ---
 st.set_page_config(page_title="AI Village Planner", layout="wide")
 
@@ -15,7 +17,6 @@ def get_base64_image(image_path):
         b64_string = base64.b64encode(img_file.read()).decode()
     return f"data:image/png;base64,{b64_string}"
 
-logo_url = get_base64_image("Jecsu logo.png")
 st.markdown(
     f"<a href='https://sites.google.com/view/jecsu-ai/home' target='_blank'>"
     f"<img src='{logo_url}' width='150'>"
@@ -25,7 +26,12 @@ st.markdown(
 
 # --- Sidebar ---
 with st.sidebar:
-    st.image("Jecsu logo.png", width=150)  # <<-- เพิ่มโลโก้ตรงนี้
+    st.markdown(
+        f"<a href='https://sites.google.com/view/jecsu-ai/home' target='_blank'>"
+        f"<img src='{logo_url}' width='150'>"
+        f"</a>",
+        unsafe_allow_html=True
+    )
     st.header("🔧 Configuration Settings")
     rows = st.slider("Number of Rows", 3, 7, GRID_ROWS)
     cols = st.slider("Number of Columns", 3, 7, GRID_COLS)
