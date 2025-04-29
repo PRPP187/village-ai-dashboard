@@ -12,23 +12,20 @@ logo_url = get_base64_image("Jecsu logo.png")
 # --- Page Config ---
 st.set_page_config(page_title="AI Village Planner", layout="wide")
 
+# ฟังก์ชันแปลงภาพเป็น base64
 def get_base64_image(image_path):
     with open(image_path, "rb") as img_file:
         b64_string = base64.b64encode(img_file.read()).decode()
     return f"data:image/png;base64,{b64_string}"
 
-st.markdown(
-    f"<a href='https://sites.google.com/view/jecsu-ai/home' target='_blank'>"
-    f"<img src='{logo_url}' width='150'>"
-    f"</a>",
-    unsafe_allow_html=True
-)
+# แปลงโลโก้ที่ชื่อว่า '96dba474-4a42-4272-a094-9a55fbc5cbe4.png' ที่คุณอัปโหลดไว้
+logo_url = get_base64_image("/mnt/data/96dba474-4a42-4272-a094-9a55fbc5cbe4.png")
 
 # --- Sidebar ---
 with st.sidebar:
     st.markdown(
         f"<a href='https://sites.google.com/view/jecsu-ai/home' target='_blank'>"
-        f"<img src='{logo_url}' width='150'>"
+        f"<img src='{logo_url}' width='150' style='margin-bottom: 20px;'>"
         f"</a>",
         unsafe_allow_html=True
     )
