@@ -7,7 +7,7 @@ import sys
 from jecsun import initialize_grid, load_or_initialize_grid, train_ai, apply_house_types, analyze_profit, GRID_ROWS, GRID_COLS, E_START_POSITION, EPISODES, csv_folder
 import base64
 
-logo_url = get_base64_image("ChatGPT_Image_Apr_26__2025__11_50_45_AM-removebg-preview.png")
+logo_url = get_base64_image("/mnt/data/Jecsu logo.png")
 
 # --- Page Config ---
 st.set_page_config(page_title="AI Village Planner", layout="wide")
