@@ -18,9 +18,6 @@ def get_base64_image(image_path):
         b64_string = base64.b64encode(img_file.read()).decode()
     return f"data:image/png;base64,{b64_string}"
 
-# แปลงโลโก้ที่ชื่อว่า '96dba474-4a42-4272-a094-9a55fbc5cbe4.png' ที่คุณอัปโหลดไว้
-logo_url = get_base64_image("/mnt/data/96dba474-4a42-4272-a094-9a55fbc5cbe4.png")
-
 # --- Sidebar ---
 with st.sidebar:
     st.markdown(
