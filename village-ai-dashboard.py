@@ -4,10 +4,9 @@ import pandas as pd
 import random
 import io
 import sys
-from jecsun import initialize_grid, load_or_initialize_grid, train_ai, apply_house_types, analyze_profit, GRID_ROWS, GRID_COLS, E_START_POSITION, EPISODES, csv_folder
 import base64
+from jecsun import initialize_grid, load_or_initialize_grid, train_ai, apply_house_types, analyze_profit, GRID_ROWS, GRID_COLS, E_START_POSITION, EPISODES, csv_folder
 
-logo_url = get_base64_image("/mnt/data/Jecsu logo.png")
 
 # --- Page Config ---
 st.set_page_config(page_title="AI Village Planner", layout="wide")
@@ -17,6 +16,8 @@ def get_base64_image(image_path):
     with open(image_path, "rb") as img_file:
         b64_string = base64.b64encode(img_file.read()).decode()
     return f"data:image/png;base64,{b64_string}"
+
+logo_url = get_base64_image("/mnt/data/Jecsu logo.png")
 
 # --- Sidebar ---
 with st.sidebar:
