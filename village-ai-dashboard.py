@@ -37,7 +37,7 @@ with st.sidebar:
 # --- Main Header ---
 st.markdown("""
     <div style='text-align: center; margin-bottom: 30px;'>
-        <h1 style='color: #FFFFFF;'>🏘️ AI Village Layout Optimization with Q-Learning</h1>
+        <h1 style='color: #FFFFFF;'>AI Village Layout Optimization with Q-Learning</h1>
         <p style='color: #DDDDDD; font-size:18px;'>
             Optimize village layouts intelligently using Q-Learning.<br>
             Design smarter. Build better. Profit more.
