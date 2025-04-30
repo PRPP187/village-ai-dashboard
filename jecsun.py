@@ -83,7 +83,7 @@ def calculate_reward_verbose(grid):
     num_houses = np.sum(grid == 'H')
     num_roads = np.sum(grid == 'R')
     if num_houses < num_roads:
-        penalty -= 1000
+        penalty -= 1500
     
     # Penalty: H not connected to R
     for r, c in h_positions:
@@ -120,7 +120,7 @@ def calculate_reward_verbose(grid):
         for shift, axis in [(1, 0), (-1, 0), (0, 1), (0, -1)]
     ], axis=0)  # Shape: (N_houses,)
 
-    bonus += np.sum(r_neighbor_count == 2) * 50
+    bonus -= np.sum(r_neighbor_count == 2) * 100
     penalty -= np.sum(r_neighbor_count == 3) * 500
     
     # Penalty: Green ratio too low or too high
