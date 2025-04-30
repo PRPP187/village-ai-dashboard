@@ -65,13 +65,13 @@ st.markdown("""
 st.markdown("""
     <div style='background-color: #FFF3CD; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
         <strong>Symbol Definitions:</strong><br>
-        <strong>E<strong> = 🚪 Entrance/Exit<br>
-        <strong>G<strong> = 🌳 Green Area<br>
-        <strong>R<strong> = 🛣️ Road<br>
-        <strong>H<strong> = 🏠 House<br>
-        <strong>0<strong> = ⬜ Empty Space<br>
-        <strong>W<strong> = 🌊 Water Body<br>
-        <strong>C<strong> = 🏘️ Common Area<br>
+        <strong>E</strong> = 🚪 Entrance/Exit<br>
+        <strong>G</strong> = 🌳 Green Area<br>
+        <strong>R</strong> = 🛣️ Road<br>
+        <strong>H</strong> = 🏠 House<br>
+        <strong>0</strong> = ⬜ Empty Space<br>
+        <strong>W</strong> = 🌊 Water Body<br>
+        <strong>C</strong> = 🏘️ Common Area<br>
     </div>
 """, unsafe_allow_html=True)
 
