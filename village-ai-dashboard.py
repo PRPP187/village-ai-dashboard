@@ -47,7 +47,23 @@ st.markdown("""
 
 # --- Info Note Box ---
 st.markdown("""
-    <div style='background-color: #FFF3CD; color: #856404; padding: 15px; border-radius: 50px; margin-bottom: 20px;'>
+    <div style='background-color: #FFF3CD; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
+        ⚡ <strong>Note:</strong><br>
+        This is a basic demonstration version of the AI. It does <strong>not</strong> save newly generated layouts for future learning.<br><br>
+        For the best experience, we recommend using a <strong>3×3 grid size</strong>.<br>
+        Using larger grids (4×4 or 5×5) may result in:<br>
+        - <strong>Longer training times</strong><br>
+        - <strong>Occasional layout inaccuracies</strong><br>
+        because the AI retrains from scratch every time, and the current number of episodes may not be sufficient to consistently find optimal layouts.<br><br>
+        📐 Additionally, <strong>horizontal layouts</strong> (e.g., 3×4, 3×5) tend to perform better than vertical layouts (e.g., 4×3, 5×3).<br>
+        This is because the AI has been trained under the assumption that <strong>houses should face north and south</strong>,<br>
+        where the top side of the grid always represents <strong>north</strong>.
+    </div>
+""", unsafe_allow_html=True)
+
+# --- Info Note Box ---
+st.markdown("""
+    <div style='background-color: #FFF3CD; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
         ⚡ <strong>Note:</strong><br>
         This is a basic demonstration version of the AI. It does <strong>not</strong> save newly generated layouts for future learning.<br><br>
         For the best experience, we recommend using a <strong>3×3 grid size</strong>.<br>
