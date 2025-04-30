@@ -26,11 +26,12 @@ with st.sidebar:
         """,
         unsafe_allow_html=True
     )
-    st.header("🔧 Configuration Settings")
+    st.header("Configuration Settings")
+    st.header("Area setting")
     rows = st.slider("Number of Rows", 3, 7, GRID_ROWS)
     cols = st.slider("Number of Columns", 3, 7, GRID_COLS)
-    e_row = st.number_input("E Position (Row, 1-based)", 1, rows, E_START_POSITION[0])
-    e_col = st.number_input("E Position (Column, 1-based)", 1, cols, E_START_POSITION[1])
+    e_row = st.number_input("Entrance/Exit Position (Row)", 1, rows, E_START_POSITION[0])
+    e_col = st.number_input("Entrance/Exit Position (Column)", 1, cols, E_START_POSITION[1])
     e_position = (e_row, e_col)
     train_ai_clicked = st.button("🚀 Train AI")
 
