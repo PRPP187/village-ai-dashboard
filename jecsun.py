@@ -115,14 +115,6 @@ def calculate_reward_verbose(grid):
     penalty -= np.sum((grid[:-1, :] == 'H') & (grid[1:, :] == 'H') & (grid[:-1, :] == 'R') & (grid[1:, :] == 'R')) * 50
     penalty -= np.sum((grid[:, :-1] == 'R') & (grid[:, 1:] == 'R') & (grid[:, :-1] == 'H') & (grid[:, 1:] == 'H')) * 50
 
-    r_neighbor_count = np.sum([
-        np.roll(grid == 'R', shift, axis=axis)[h_positions[:, 0], h_positions[:, 1]]
-        for shift, axis in [(1, 0), (-1, 0), (0, 1), (0, -1)]
-    ], axis=0)  # Shape: (N_houses,)
-
-    bonus -= np.sum(r_neighbor_count == 2) * 100
-    penalty -= np.sum(r_neighbor_count == 3) * 500
-    
     # Penalty: Green ratio too low or too high
     total_cells = rows * cols
     green_cells = np.sum(grid == 'G')
