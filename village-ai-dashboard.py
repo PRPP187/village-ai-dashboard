@@ -6,6 +6,7 @@ import io
 import sys
 import base64
 from jecsun import initialize_grid, load_or_initialize_grid, train_ai, apply_house_types, analyze_profit, GRID_ROWS, GRID_COLS, E_START_POSITION, EPISODES, csv_folder
+from aria_page import render_aria_page
 
 # --- Page Config ---
 st.set_page_config(page_title="AI Village Planner", layout="wide")
@@ -15,6 +16,13 @@ def get_base64_image(image_path):
     with open(image_path, "rb") as img_file:
         b64_string = base64.b64encode(img_file.read()).decode()
     return f"data:image/png;base64,{b64_string}"
+
+# --- Page selection ---
+page = st.sidebar.radio("Navigate", ["AI Village Planner", "Aria Watchlist"], index=0)
+
+if page == "Aria Watchlist":
+    render_aria_page()
+    st.stop()
 
 # --- Sidebar ---
 with st.sidebar:
